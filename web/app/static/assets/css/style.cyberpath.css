@@ -1,0 +1,72 @@
+.recent {
+    transition: all 1s ease-in-out;
+    opacity: 0.7;
+}
+
+tr {
+    border-bottom: 3px solid #444 !important;
+}
+
+#currentLab {
+    transform: rotate(-25deg);
+}
+
+#titleLab {
+    position: relative;
+}
+
+#place_check::placeholder {
+    color: #555;
+}
+
+.cy_active {
+    background-color: #db1430;
+    color: white;
+}
+
+
+.scroll_change {
+    scrollbar-face-color: #367CD2;
+    scrollbar-shadow-color: #FFFFFF;
+    scrollbar-highlight-color: #FFFFFF;
+    scrollbar-3dlight-color: #FFFFFF;
+    scrollbar-darkshadow-color: #FFFFFF;
+    scrollbar-track-color: #FFFFFF;
+    scrollbar-arrow-color: #FFFFFF;
+}
+
+.scroll_change::-webkit-scrollbar {
+    width: 7px;
+}
+
+.scroll_change::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+}
+
+.scroll_change::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #db1430;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.scroll_change:hover::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #db1430;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.item_active {
+    color: #e45735 !important;
+}
+
+.li_active {
+    border-bottom: 2px solid #e45735;
+}
+
+.item_deactive {
+    color: rgb(185, 185, 185);
+}
