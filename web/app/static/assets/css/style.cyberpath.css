@@ -24,6 +24,10 @@ tr {
     color: white;
 }
 
+.active{
+    background-color: #943124!important;
+}
+
 
 .scroll_change {
     scrollbar-face-color: #367CD2;

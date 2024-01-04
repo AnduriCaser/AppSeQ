@@ -12,23 +12,18 @@ from flask import (
 )
 from flask_security import SQLAlchemySessionUserDatastore
 from app.modules.auth.models import *
+from app.modules.admin import hash_password
 import re
 import uuid
 from app.db import db_session
 from flask_security.utils import login_user, logout_user, current_user
 from flask_mail import Mail, Message
-import hashlib
+from app.modules.user.models import User, Role, users_roles
 
 auth = Blueprint("auth", __name__, url_prefix="/auth")
 
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 mail = Mail(current_app)
-
-
-def hash_password(password):
-    salt = "162886609164245863786468725781264657609"
-    key = "%s%s" % (salt, password)
-    return hashlib.sha256(key.encode("utf-8")).hexdigest()
 
 
 def email_sender(email, html):

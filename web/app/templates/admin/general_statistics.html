@@ -1,0 +1,208 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
+{% endblock header %}
+
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Dashboard
+    <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag %}
+<div class="menu-item">
+    <a class="menu-link" href="{{url_for('admin.dashboard')}}">
+        <span class="menu-icon">
+            <i class="bi bi-house fs-3 text-white"></i>
+        </span>
+        <span class="menu-title text-white">Dashboard</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.profile')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">Profile</span>
+    </a>
+    <a class="menu-link active" href="{{url_for('admin.general_statistics')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">General Statistics</span>
+    </a>
+    <a class="menu-link" href="{{url_for('auth.logout')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-ranking-star"></i>
+        </span>
+        <span class="menu-title">Logout</span>
+    </a>
+</div>
+{% endblock nav_tag %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-2 p-2">
+        <div class="col-md text-white">
+            <div class="d-flex flex-column">
+                <div class="float-start">
+                    <p style="color:rgb(185, 185, 185);" class="card-text">USERS LIST</p>
+                </div>
+                <div class="d-flex justify-content-start align-items-start float-start mt-3">
+                    <h3 class="card-title">General Statistics</h3>
+                    <span style="background-color:rgb(30, 30, 30);color: rgb(185, 185, 185);border-radius: 3px;"
+                        class="badge ms-2 mb-2">3120 Points</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="float-end">
+                <a href="" style="background-color: #943124!important;color: white;border-radius: 5px;"
+                    class="btn btn-sm">
+                    <span class="text-center fw-bolder">Add Users</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 p-2">
+        <div style="height:250px;border-radius: 7px;background-color: #222;border-color: #e45735!important;font-family: Source Sans Pro,sans-serif!important;"
+            class="col-md p-0 border border-0 mx-3 statistics_box">
+            <div class="row mt-1 p-2">
+                <div class="col-md">
+                    <div class="float-start p-6">
+                        <h5 style="color:#e45735;opacity: 0.9;" class="card-title">TOTAL USERS</h5>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="float-end p-6">
+                        <span style="border-radius: 3px;background-color: #333;" class="badge">
+                            <i class="fa-solid fa-arrow-rotate-right text-white"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1 p-2">
+                <div class="col-md text-center">
+                    <h1 style="font-size: 50px;" class="card-title text-white">{{users.count()}}</h1>
+                    <p style="color: rgb(185,185,185);" class="card-text">USERS</p>
+                </div>
+            </div>
+        </div>
+        <div style="height:250px;border-radius: 7px;background-color: #222;border-color: #e45735!important;font-family: Source Sans Pro,sans-serif!important;"
+            class="col-md p-0 border border-0 mx-3 statistics_box">
+            <div class="row mt-1 p-2">
+                <div class="col-md">
+                    <div class="float-start p-6">
+                        <h5 style="color:#e45735;opacity: 0.9;" class="card-title">ACTIVE USERS</h5>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="float-end p-6">
+                        <span style="border-radius: 3px;background-color: #333;" class="badge">
+                            <i class="fa-solid fa-arrow-rotate-right text-white"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1 p-2">
+                <div class="col-md text-center">
+                    <h1 style="font-size: 50px;" class="card-title text-white">0</h1>
+                    <p style="color: rgb(185,185,185);" class="card-text">ACTIVE USERS</p>
+                </div>
+            </div>
+        </div>
+        <div style="height:250px;border-radius: 7px;background-color: #222;border-color: #e45735!important;font-family: Source Sans Pro,sans-serif!important;"
+            class="col-md p-0 border border-0 mx-3 statistics_box">
+            <div class="row mt-1 p-2">
+                <div class="col-md">
+                    <div class="float-start p-6">
+                        <h5 style="color:#e45735;opacity: 0.9;" class="card-title">TOTAL LABS</h5>
+                    </div>
+                </div>
+                <div class="col-md">
+                    <div class="float-end p-6">
+                        <span style="border-radius: 3px;background-color: #333;" class="badge">
+                            <i class="fa-solid fa-arrow-rotate-right text-white"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1 p-2">
+                <div class="col-md text-center">
+                    <h1 style="font-size: 50px;" class="card-title text-white">{{labs.count()}}</h1>
+                    <p style="color: rgb(185,185,185);" class="card-text">LABS</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-6 p-2">
+        <div class="col-md p-0">
+            <h3 class="card-title text-white">Assigned Users</h3>
+            <input id="place_check"
+                style="background-color: #222;color: rgb(185, 185, 185);border-radius: 5px;width: 30%;height: 35px;font-size: smaller;"
+                class="form-control cy_shadow border-0 mt-3" type="search" placeholder="Search Users ...">
+        </div>
+    </div>
+    <div class="row mt-2 p-2">
+        <div style="background-color: #222;border-radius: 7px;" class="col-md p-0">
+            <div style="background-color: #222;border-radius: 7px;" class="card">
+                <div class="card-body p-5">
+                    <div class="table-responsive">
+                        <table class="table align-middle g-4">
+                            <thead>
+                                <tr id="heading_one" class="border-0">
+                                    <th class="text-white fw-bolder">EMAIL</th>
+                                    <th class="text-white fw-bolder">START DATE</th>
+                                    <th class="text-white fw-bolder text-center">END DATE</th>
+                                    <th class="text-white fw-bolder text-center">POINTS</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-family: 'Source Sans Pro', sans-serif!important;">
+                                {% for user in users %}
+                                    <tr class="border-0">
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="d-flex justify-content-start flex-column">
+                                                    <a style="color:rgb(185, 185, 185);" href="">
+                                                        <span style="color: rgb(185, 185, 185);"
+                                                            class="course_link fw-bolder mb-1 fs-6">
+                                                            {{user.email}}
+                                                        </span>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span style="color: rgb(185, 185, 185);" class="fw-bolder fs-6">10 Feb 2021</span>
+                                        </td>
+                                        <td>
+                                            <span style="color: rgb(185, 185, 185);"
+                                                class="fw-bolder d-block mb-1 fs-6 text-center">30 Apr 2021</span>
+                                        </td>
+                                        <td>
+                                            <span style="color: rgb(185, 185, 185);"
+                                                class="fw-bolder d-block mb-1 fs-6 text-center">{{user.points}}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $(".statistics_box").on("mouseover", function () {
+            $(this).removeClass("border-0");
+        }).on("mouseleave", function () {
+            $(this).addClass("border-0");
+        })
+    });
+</script>
+{% endblock scripts %}

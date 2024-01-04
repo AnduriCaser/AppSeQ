@@ -6,7 +6,7 @@ from sqlalchemy_utils import database_exists, create_database
 
 
 engine = create_engine(
-    "mysql+pymysql://root:Tr1234567@127.0.0.1:3306/AppSeq", pool_size=90)
+    "mysql+pymysql://root:Tr1234567@127.0.0.1:3306/appseq", pool_size=90)
 db_session = scoped_session(sessionmaker(bind=engine))
 
 
@@ -18,5 +18,4 @@ Base.query = db_session.query_property()
 
 
 def init_db():
-    import app.modules.auth.models
     Base.metadata.create_all(bind=engine)

@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Profile
+	<span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag%}
+<div class="menu-item">
+	<a class="menu-link" href="{{url_for('user.dashboard')}}">
+		<span class="menu-icon">
+			<i class="bi bi-house fs-3"></i>
+		</span>
+		<span class="menu-title">Dashboard</span>
+	</a>
+	<a class="menu-link active" href="{{url_for('user.profile')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-user"></i>
+		</span>
+		<span class="menu-title">Profile</span>
+	</a>
+	<a class="menu-link" href="{{url_for('user.leaderboard')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Leaderboard</span>
+	</a>
+	<a class="menu-link" href="{{url_for('auth.logout')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Logout</span>
+	</a>
+</div>
+{%endblock nav_tag%}
+
+{% block content %}
+<div style="width: 50%;" class="container">
+	<div class="row d-flex justify-content-center align-items-center px-5">
+		<div style="background-color: #222;" class="col">
+			<div style="background-color: #222;" class="card">
+				<div class="card-body">
+					<div class="d-flex justify-content-center align-items-center mt-3">
+						<label class="form-check form-check-inline form-check-solid me-5">
+							<input checked style="background-color: #444;" class="form-check-input checker"
+								type="checkbox">
+							<span style="color: #db1430;" class="fw-bold ps-2 fs-6">Profile</span>
+						</label>
+						<label class="form-check form-check-inline form-check-solid ">
+							<input style="background-color: #444;" class="form-check-input checker" type="checkbox">
+							<span style="color: #db1430;" class="fw-bold ps-2 fs-6">Edit</span>
+						</label>
+					</div>
+					<form style="display: none;" id="form_kt" enctype=multipart/form-data class="py-5" method="post"
+						action="{{url_for('user.update')}}">
+						<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+						<div class="row mb-10">
+							<div class="col-md">
+								<div style="border: 4px solid #444!important;" class="image-input"
+									data-kt-image-input="true">
+									<div class="image-input-wrapper w-100px h-100px"></div>
+									<label style="background-color: #444;"
+										class="btn btn-icon btn-circle w-25px h-25px shadow"
+										data-kt-image-input-action="change" data-bs-toggle="tooltip" title=""
+										data-bs-original-title="Change avatar">
+										<i style="color: #db1430;" class="bi bi-pencil-fill fs-7"></i>
+										<input type="file" name="avatar" accept=".png, .jpg, .jpeg">
+										<input type="hidden" name="avatar_remove">
+									</label>
+									<span style="background-color: #444;"
+										class="btn btn-icon btn-circle w-25px h-25px shadow"
+										data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title=""
+										data-bs-original-title="Cancel avatar">
+										<i style="color: #db1430;" class="bi bi-x fs-2"></i>
+									</span>
+									<span style="background-color: #444;"
+										class="btn btn-icon btn-circle w-25px h-25px shadow"
+										data-kt-image-input-action="remove" data-bs-toggle="tooltip" title=""
+										data-bs-original-title="Remove avatar">
+										<i style="color: #db1430;" class="bi bi-x fs-2"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class="fv-row mb-10">
+							<label style="color: #db1430;" class="form-label fw-bolder">Username</label>
+							<input style="background-color: #444;color: #84CD17;border-radius: 7px;"
+								class="form-control cy_shadow border-0" name="username" type="text">
+						</div>
+						<div class="fv-row mb-10">
+							<label style="color: #db1430;" class="form-label fw-bolder">Password</label>
+							<input style="background-color: #444;color: #84CD17;border-radius: 7px;"
+								class="form-control cy_shadow border-0" name="password" type="password">
+						</div>
+						<div class="fv-row mb-10">
+							<label style="color: #db1430;" class="form-label fw-bolder">Confirm Password</label>
+							<input style="background-color: #444;color: #84CD17;border-radius: 7px;"
+								class="form-control cy_shadow border-0" name="repassword" type="password">
+						</div>
+						<div class="row">
+							<div class="col">
+								<button type="submit" style="background-color: #84CD17!important;"
+									class="btn btn-sm btn-success mx-1">Save Changes</button>
+							</div>
+						</div>
+					</form>
+					<div id="kt_box" style="position: relative!important;"
+						class="row d-flex justify-content-center align-items-center mt-6 mx-auto">
+						<div class="col-md">
+							<img width="125px" height="125px" class="img-fluid"
+								src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+							<button style="background-color: #db1430!important;" class="btn btn-sm btn-danger mt-5"><a
+									style="color: inherit;" href="{{url_for('user.delete',id=current_user.id)}}">Delete Account</a></button>
+						</div>
+						<div class="col-md mb-2">
+							<h6 style="color: rgb(185, 185, 185);" class="card-title">{{username}}</h6>
+							<h6 style="color: rgb(185, 185, 185);" class="card-title mt-4">Rank<span
+									style="color: #db1430;border-radius: 5px;background-color: #444;"
+									class="badge ms-5 fs-4">1st</span></h6>
+							<h6 style="color: rgb(185, 185, 185);" class="card-title mt-4">Total
+								Points<span style="color:#db1430;border-radius: 5px;background-color: #444;"
+									class="badge ms-5 fs-4">{{points}}</span></h6>
+							<div class="d-flex align-items-center">
+								<p style="color: rgb(185, 185, 185);" class="card-text fw-bolder mt-4">{{invite_code}}
+								</p>
+								<span id="inviteCode" class="badge ms-3 mb-1"
+									style="background-color: #444;cursor: pointer;"><i style="color: #db1430;"
+										class="fa-solid fa-clipboard"></i></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+{%block scripts%}
+<script>
+	$(document).ready(function () {
+		
+		$('#inviteCode').click(function (e) {
+			console.log($(this).prev("p").first().text())
+			$(this).html('<i style="color: #db1430;"class="fa-solid fa-check"></i>')
+			setTimeout(() => {
+				$(this).html('<i style="color: #db1430;"class="fa-solid fa-clipboard"></i>')
+			}, 1500);
+		});
+
+		$('.checker').change(function (e) {
+			if ($('.checker').attr("checked")) {
+				$('.checker').prop('checked', true);
+			};
+			$('.checker').not(this).prop("checked", false);
+			if ($('.checker').index(e.target) == 1) {
+				$('#kt_box').fadeOut(800, function () {
+					$('#kt_box').attr("style", "display: none !important");
+					$('#form_kt').fadeIn(1000);
+				});
+			} else {
+				$('#form_kt').fadeOut(800, function () {
+					$('#form_kt').attr("style", "display: none !important");
+					$('#kt_box').fadeIn(1000);
+				});
+			};
+		});
+	});
+</script>
+{%endblock scripts%}

@@ -1,0 +1,150 @@
+{% extends "layout.html" %}
+
+
+{% block header%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+{% endblock header%}
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">View Course
+    <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag %}
+<div class="menu-item">
+    <a class="menu-link" href="{{url_for('admin.dashboard')}}">
+        <span class="menu-icon">
+            <i class="bi bi-house fs-3 text-white"></i>
+        </span>
+        <span class="menu-title text-white">Dashboard</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.profile')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">Profile</span>
+    </a>
+        <a class="menu-link active" href="{{url_for('admin.general_statistics')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">General Statistics</span>
+    </a>
+    <a class="menu-link" href="{{url_for('auth.logout')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-ranking-star"></i>
+        </span>
+        <span class="menu-title">Logout</span>
+    </a>
+</div>
+{% endblock nav_tag %}
+
+{% block content %}
+<div class="container">
+    {% if course %}
+    <div class="row mt-2 p-2">
+        <div class="col-md text-white">
+            <div class="d-flex flex-column">
+                <div class="d-flex justify-content-start align-items-start float-start">
+                    <h3 class="card-title">{{course.name}}</h3>
+                    <span style="background-color:rgb(30, 30, 30);color: rgb(185, 185, 185);border-radius: 3px;"
+                        class="badge ms-2 mb-2">3120 Points</span>
+                </div>
+                <div class="float-start">
+                    <p style="color:rgb(185, 185, 185);" class="card-text">{{course.description}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md">
+            <div class="float-end">
+                <a href="{{url_for('admin.edit_course', slug=course.slug)}}"
+                    style="background-color: #943124!important;color: white;border-radius: 5px;" class="btn btn-sm">
+                    <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
+                    <span class="text-center fw-bolder">Edit Course</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    {% endif %}
+    {% for challenge in challenges %}
+    <div class="fv-row mt-12 p-2">
+        <ul class="list-group">
+            <li style="height: 80px;background-color:rgb(25,25,25);border-top-left-radius: 7px;border-top-right-radius: 7px;"
+                class="list-group-item p-8">
+                <span class="fw-bolder fs-4 text-white">{{challenge.name}}</span>
+            </li>
+            {% for lab in challenge.labs %}
+            {% if (loop.index) % 2 == 0 %}
+            <li style="background-color: rgb(25,25,25);" class="list-group-item px-8 py-5">
+                <div class="row">
+                    <div style="font-size: 12px;" class="col-md">
+                        <a style="color: white;" href="{{url_for('admin.labs',slug=lab.slug)}}">
+                            <span style="color: white;" class="course_link fw-bolder">{{lab.name}}</span>
+                        </a>
+                        <p style="color:rgb(185, 185, 185);" class="card-text">{{lab.description}}</p>
+                    </div>
+                    <div style="font-family: Source Sans Pro,sans-serif!important;" class="col-md">
+                        <div style="width: 200px;" class="row float-end">
+                            <div class="col-md d-flex align-items-center">
+                                <i style="color:rgb(185, 185, 185);" class="fa-solid fa-bullseye mx-auto"></i>
+                                <p class="card-text text-white mx-auto">{{lab.points}} points</p>
+                            </div>
+                            <div class="col-md">
+                                <p class="card-text text-white">Difficulty: {{lab.difficulty}}/10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li style="background-color: rgb(12,12,12);" class="list-group-item px-8 py-5">
+                <div class="row">
+                    <div style="font-size: 12px;" class="col-md">
+                        <a style="color: white;" href="{{url_for('admin.labs',slug=lab.slug)}}">
+                            <span style="color: white;" class="course_link fw-bolder">{{lab.name}}</span>
+                        </a>
+                        <p style="color:rgb(185, 185, 185);" class="card-text">{{lab.description}}</p>
+                    </div>
+                    <div style="font-family: Source Sans Pro,sans-serif!important;" class="col-md">
+                        <div style="width: 200px;" class="row float-end">
+                            <div class="col-md d-flex align-items-center">
+                                <i style="color:rgb(185, 185, 185);" class="fa-solid fa-bullseye mx-auto"></i>
+                                <p class="card-text text-white mx-auto">{{lab.points}} points</p>
+                            </div>
+                            <div class="col-md">
+                                <p class="card-text text-white">Difficulty: {{lab.difficulty}}/10</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content%}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $(".course_link").on("mouseover", function () {
+            $(this).css({
+                "color": "#943124",
+                "text-decoration": "underline #943124"
+            });
+        }).on("mouseleave", function () {
+            $(this).css({
+                "color": "rgb(185, 185, 185)",
+                "text-decoration": "none"
+            });
+        });
+    }); 
+</script>
+
+{% endblock scripts %}

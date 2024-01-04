@@ -1,0 +1,161 @@
+{% extends "layout.html" %}
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">LeaderBoard
+	<span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag%}
+<div class="menu-item">
+	<a class="menu-link" href="{{url_for('user.dashboard')}}">
+		<span class="menu-icon">
+			<i class="bi bi-house fs-3"></i>
+		</span>
+		<span class="menu-title">Dashboard</span>
+	</a>
+	<a class="menu-link" href="{{url_for('user.profile')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-user"></i>
+		</span>
+		<span class="menu-title">Profile</span>
+	</a>
+	<a class="menu-link active" href="{{url_for('user.leaderboard')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Leaderboard</span>
+	</a>
+	<a class="menu-link" href="{{url_for('auth.logout')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Logout</span>
+	</a>
+</div>
+{%endblock nav_tag%}
+
+{% block content %}
+<div style="width:80%" class="container">
+	<div class="row justify-content-center align-items-center">
+		<div style="background-color: #222;" class="card mb-5 mb-xl-8">
+			<div class="card-body pt-3">
+				<div class="table-responsive pt-3">
+					<table class="table  align-middle gs-0 gy-4">
+						<thead>
+							<tr>
+								<th style="color: #db1430;" class="fw-bolder">Name</th>
+								<th style="color: #db1430;" class="fw-bolder">Rank</th>
+								<th style="color: #db1430;" class="fw-bolder">Total Points</th>
+								<th style="color: #db1430;" class="fw-bolder text-center">Solved Labs</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<div class="symbol symbol-45px me-5">
+											<img alt="Pic"
+												src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+										</div>
+										<div class="d-flex justify-content-start flex-column">
+											<span style="color: rgb(185, 185, 185);" class="fw-bolder mb-1 fs-6">Jesus Christ</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder fs-3 ms-4">1</span>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder d-block mb-1 ms-3 fs-6">500pts</span>
+								</td>
+								<td class="text-center"><span class="fw-bolder" style="color: orange;">13</span></td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<div class="symbol symbol-45px me-5">
+											<img alt="Pic"
+												src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+										</div>
+										<div class="d-flex justify-content-start flex-column">
+											<span style="color: rgb(185, 185, 185);" class="fw-bolder mb-1 fs-6">Jesus Christ</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder fs-3 ms-4">2</span>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder d-block mb-1 ms-3 fs-6">500pts</span>
+								</td>
+								<td class="text-center"><span class="fw-bolder" style="color: orange;">13</span></td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<div class="symbol symbol-45px me-5">
+											<img alt="Pic"
+												src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+										</div>
+										<div class="d-flex justify-content-start flex-column">
+											<span style="color: rgb(185, 185, 185);" class="fw-bolder mb-1 fs-6">Jesus Christ</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder fs-3 ms-4">3</span>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder d-block mb-1 ms-3 fs-6">500pts</span>
+								</td>
+								<td class="text-center"><span class="fw-bolder" style="color: orange;">13</span></td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<div class="symbol symbol-45px me-5">
+											<img alt="Pic"
+												src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+										</div>
+										<div class="d-flex justify-content-start flex-column">
+											<span style="color: rgb(185, 185, 185);" class="fw-bolder mb-1 fs-6">Jesus Christ</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder fs-3 ms-4">4</span>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder d-block mb-1 ms-3 fs-6">500pts</span>
+								</td>
+								<td class="text-center"><span class="fw-bolder" style="color: orange;">13</span></td>
+							</tr>
+							<tr>
+								<td>
+									<div class="d-flex align-items-center">
+										<div class="symbol symbol-45px me-5">
+											<img alt="Pic"
+												src="{{url_for('static', filename='assets/media/avatars/150-1.jpg')}}">
+										</div>
+										<div class="d-flex justify-content-start flex-column">
+											<span style="color: rgb(185, 185, 185);" class="fw-bolder mb-1 fs-6">Jesus Christ</span>
+										</div>
+									</div>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder fs-3 ms-4">5</span>
+								</td>
+								<td>
+									<span style="color: #84CD17;" class="fw-bolder d-block mb-1 ms-3 fs-6">500pts</span>
+								</td>
+								<td class="text-center"><span class="fw-bolder" style="color: orange;">13</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}

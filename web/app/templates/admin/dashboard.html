@@ -1,0 +1,256 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+{% endblock header %}
+
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Dashboard
+    <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag %}
+<div class="menu-item">
+    <a class="menu-link active" href="{{url_for('admin.dashboard')}}">
+        <span class="menu-icon">
+            <i class="bi bi-house fs-3 text-white"></i>
+        </span>
+        <span class="menu-title text-white">Dashboard</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.profile')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">Profile</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">General Statistics</span>
+    </a>
+    <a class="menu-link" href="{{url_for('auth.logout')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-ranking-star"></i>
+        </span>
+        <span class="menu-title">Logout</span>
+    </a>
+</div>
+{% endblock nav_tag %}
+
+{% block content %}
+<div class="container">
+    <div class="row mt-2 p-2">
+        <div class="col-md p-0">
+            <h3 class="card-title text-white">Your Courses</h3>
+            <input id="place_check"
+                style="background-color: #222;color: rgb(185, 185, 185);border-radius: 5px;width: 45%;height: 35px;font-size: smaller;"
+                class="form-control cy_shadow border-0 mt-7" type="search" placeholder="Search Course Name, Desc ...">
+        </div>
+        <div class="col-md p-0">
+            <a class="btn btn-sm text-white float-end"
+                style="text-decoration: none;color: inherit;background-color: #943124;border-radius: 5px;"
+                href="{{url_for('admin.create_course')}}"><i class="fa-solid fa-plus text-white"></i> Create Course</a>
+        </div>
+    </div>
+    <div class="row mt-1 p-2">
+        <div style="background-color: #222;border-radius: 7px;" class="col-md p-0">
+            <div style="background-color: #222;border-radius: 7px;" class="card">
+                <div class="card-body p-5">
+                    <div class="table-responsive">
+                        <table class="table align-middle g-4">
+                            <thead>
+                                <tr id="heading_one" class="border-0">
+                                    <th class="text-white fw-bolder">COURSE NAME</th>
+                                    <th class="text-white fw-bolder">DESCRIPTION</th>
+                                    <th class="text-white fw-bolder text-center">CHALLENGES</th>
+                                    <th class="text-white fw-bolder text-center">LABS</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-family: 'Source Sans Pro', sans-serif!important;">
+                                {% for course in courses %}
+                                <tr class="border-0">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex justify-content-start flex-column">
+                                                <a style="color:rgb(185, 185, 185);"
+                                                    href="{{url_for('admin.courses',slug=course.slug)}}">
+                                                    <span style="color: rgb(185, 185, 185);"
+                                                        class="course_link fw-bolder mb-1 fs-6">
+                                                        {{course.name}}
+                                                    </span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder fs-6">{{course.description}}</span>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder d-block mb-1 fs-6 text-center">{{course.challenges|length}}</span>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder d-block mb-1 fs-6 text-center">{{course.get_challenges(course)}}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 p-2">
+        <div class="col-md p-0">
+            <div class="float-end">
+                {{course_paginate.links}}
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 p-2">
+        <h3 class="card-title text-white mt-8">Lab List</h3>
+        <input id="place_check"
+            style="background-color: #222;color: rgb(185, 185, 185);border-radius: 5px;width: 22.5%;height: 35px;font-size: smaller;"
+            class="form-control cy_shadow border-0 mt-7" type="search" placeholder="Search Course Name, Desc ...">
+    </div>
+    <div class="row mt-1 p-2">
+        <div style="background-color: #222;border-radius: 7px;" class="col-md p-0">
+            <div style="background-color: #222;border-radius: 7px;" class="card">
+                <div class="card-body p-5">
+                    <div class="table-responsive">
+                        <table class="table align-middle g-4">
+                            <thead>
+                                <tr id="heading_one" class="border-0">
+                                    <th class="text-white fw-bolder">LAB NAME</th>
+                                    <th class="text-white fw-bolder">DESCRIPTION</th>
+                                    <th class="text-white fw-bolder text-center">POINTS</th>
+                                    <th class="text-white fw-bolder text-center">DIFFICULTY</th>
+                                    <th class="text-white fw-bolder text-center">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-family: 'Source Sans Pro', sans-serif!important;">
+                                {% for lab in labs %}
+                                <tr class="border-0">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="d-flex justify-content-start flex-column">
+                                                <span style="color: rgb(185, 185, 185);"
+                                                    class="fw-bolder mb-1 fs-6">{{lab.name}}</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder fs-6">{{lab.description}}</span>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder d-block mb-1 fs-6 text-center">{{lab.points}}</span>
+                                    </td>
+                                    <td>
+                                        <span style="color: rgb(185, 185, 185);"
+                                            class="fw-bolder d-block mb-1 fs-6 text-center">2</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center">
+                                            <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}">
+                                                <span style="color: rgb(185, 185, 185);cursor: pointer;"
+                                                    class="fw-bolder d-block mb-1 fs-6 p-2 border-0"><i
+                                                        class="fa-solid fa-pen-to-square point"></i></span>
+                                            </a>
+                                            <a href="{{url_for('admin.labs',slug=lab.slug)}}">
+                                                <span style="color: rgb(185, 185, 185);cursor: pointer;"
+                                                    class="fw-bolder d-block mb-1 fs-6 p-2 border-0"><i
+                                                        class="fa-solid fa-eye point"></i></span>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2 p-2">
+        <div class="col-md p-0">
+            <div class="float-end">
+                {{lab_paginate.links}}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+
+        $(".course_link").on("mouseover", function () {
+            $(this).css({
+                "color": "#943124",
+                "text-decoration": "underline #943124"
+            });
+        }).on("mouseleave", function () {
+            $(this).css({
+                "color": "rgb(185, 185, 185)",
+                "text-decoration": "none"
+            });
+        });
+
+
+        $(".active>.page-link").css({
+            "background-color": "#943124",
+            "border-radius": "3px",
+            "text-decoration": "none",
+            "color": "white",
+            "pointer-events": "none"
+        });
+
+        $(".page-item>.page-link").on("mouseover", function () {
+            if (!$(this).attr("aria-label")) {
+                $(this).css({
+                    "border": "1px solid gray",
+                    "text-decoration": "none",
+                    "background-color": "none",
+                });
+            }
+        }).on("mouseleave", function () {
+            $(this).css("border", "none");
+        });
+
+
+
+        $(".point").on('mouseover', function () {
+            $(this).css({
+                'color': '#943124'
+            });
+        }).on('mouseleave', function () {
+            $(this).css({
+                'color': 'rgb(185, 185, 185)'
+            });
+        });
+
+        $("tr:not(#heading_one)").on('mouseover', function () {
+            $(this).css({
+                'background-color': '#333'
+            });
+        }).on('mouseleave', function () {
+            $(this).css({
+                'background-color': '#222'
+            });
+        });
+    });
+</script>
+{% endblock scripts %}

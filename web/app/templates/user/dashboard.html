@@ -1,0 +1,148 @@
+{% extends "layout.html" %}
+{%block header%}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" rel="stylesheet">
+{%endblock header%}
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Dashboard
+	<span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag%}
+<div class="menu-item">
+	<a class="menu-link active" href="{{url_for('user.dashboard')}}">
+		<span class="menu-icon">
+			<i class="bi bi-house fs-3 text-white"></i>
+		</span>
+		<span class="menu-title text-white">Dashboard</span>
+	</a>
+	<a class="menu-link" href="{{url_for('user.profile')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-user"></i>
+		</span>
+		<span class="menu-title">Profile</span>
+	</a>
+	<a class="menu-link" href="{{url_for('user.leaderboard')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Leaderboard</span>
+	</a>
+	<a class="menu-link" href="{{url_for('auth.logout')}}">
+		<span class="menu-icon">
+			<i class="fa-solid fa-ranking-star"></i>
+		</span>
+		<span class="menu-title">Logout</span>
+	</a>
+</div>
+{%endblock nav_tag%}
+
+{% block content %}
+<div id="kt_content_container" class="container">
+	<div style="overflow-x: hidden;" style="font-family: 'DM Sans', sans-serif;" class="row g-5 text-center">
+		<div style="background-color: #222;
+		border-radius: 15px;" class="col-md  mx-4 p-4">
+			<h5 style="color: #db1430;" class="card-title py-5">My Rank</h5>
+			<i style="color: #db1430;" class="fa-solid fa-ranking-star fa-2x"></i>
+			<p style="color: #db1430;" class="card-text mt-4">128</p>
+		</div>
+		<div style="background-color: #222;
+		border-radius: 15px;" class="col-md mx-4 p-4">
+			<h5 style="color: #db1430;" class="card-title py-5">Total Labs I Solved</h5>
+			<i style="color: #db1430;" class="fa-regular fa-circle-check fa-2x"></i>
+			<p style="color: #db1430;" class="card-text mt-4">128</p>
+		</div>
+		<div style="background-color: #222;
+		border-radius: 15px;" class="col-md mx-4 p-4">
+			<h5 style="color: #db1430;" class="card-title py-5">Total Points I Have</h5>
+			<i style="color: #db1430;" class="fa-solid fa-star fa-2x"></i>
+			<p style="color: #db1430;" class="card-text mt-4">128</p>
+		</div>
+		<div style="background-color: #222;		
+		border-radius: 15px;" class="col-md mx-4 p-4">
+			<h5 style="color: #db1430;" class="card-title py-5">Total Labs I Played</h5>
+			<i style="color: #db1430;" class="fa-solid fa-play fa-2x"></i>
+			<p style="color: #db1430;" class="card-text mt-4">128</p>
+		</div>
+	</div>
+	<div class="row g-5 text-center mt-5">
+		<div style="background-color: #222;border-radius: 5px;" class="col-md mx-4 p-4 recent">
+			<div style="background-color: #222;" class="card">
+				<div class="card-body">
+					<h6 id="currentLab" style="color: white;position: fixed;"></h6>
+					<h5 id="titleLab" style="color: #84CD17;" class="card-title">Privilage Escalation</h5>
+					<i style="color: #84CD17;" class="fa-solid fa-skull fa-3x mt-4"></i>
+					<h5 style="color: #84CD17;position: fixed;" class="card-title">%50</h5>
+					<div style="background-color: rgba(132, 205, 23, 0.5)!important;" class="progress h-7px mt-7">
+						<div class="progress-bar" role="progressbar"
+							style="width: 50%;background-color: #84CD17!important;" aria-valuenow="50" aria-valuemin="0"
+							aria-valuemax="100"></div>
+					</div>
+					<div style="position: relative;top: 5px;" class="d-flex align-items-center justify-content-center">
+						<button style="background-color: #84CD17;"
+							class="btn btn-sm btn-success text-white float-start mt-6 me-auto">Continue</button>
+						<div class="ms-auto mt-5">
+							<h4 style="color: #84CD17;" class="card-title">235/560 pts</h4>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="background-color: #222;border-radius: 5px;" class="col-md mx-4 p-4 recent">
+			<div style="background-color: #222;" class="card">
+				<div class="card-body d-flex flex-column align-items-center justify-content-center">
+					<h5 style="color: #84CD17;" class="card-title">Newsletter</h5>
+					<i style="color: #84CD17;" class="fa-solid fa-newspaper fa-3x mt-4"></i>
+					<p style="color: #84CD17;" class="card-text mt-6">CVE-2022-19821 POC. Remote Code Execution</p>
+					<div class="d-flex align-items-center justify-content-center">
+						<button style="background-color: #84CD17;"
+							class="btn btn-sm btn-success text-white mt-1 me-auto">Check the news</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="background-color: #222;border-radius: 5px;" class="col-md mx-4 p-4 recent">
+			<div style="background-color: #222;" class="card">
+				<div class="card-body d-flex flex-column align-items-center justify-content-center">
+					<h5 style="color: #84CD17;" class="card-title">Purchase</h5>
+					<i style="color: #84CD17;" class="fa-solid fa-chart-line fa-3x mt-4"></i>
+					<p style="color: #84CD17;position: relative;top:7px;" class="card-text mt-4">What are you waiting
+						for ?</p>
+					<div class="d-flex align-items-center justify-content-center">
+						<button style="background-color: #84CD17;"
+							class="btn btn-sm btn-success text-white mt-3 me-auto">Checkout</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+	$(document).ready(function () {
+		currentString = "Your Recent Lab";
+		$('.recent').on('mouseover', function (e) {
+			$(this).css({
+				'transform': 'scale(1.1)',
+				'opacity': 1
+			});
+		}).on('mouseleave', function () {
+			$(this).css({
+				'transform': 'scale(1)',
+				'opacity': 0.7
+			});
+		});
+	});
+</script>
+{% endblock scripts %}
+
+<!-- [...currentString].forEach(s => {
+	if ($('#currentLab').text().length !== currentString.length) {
+		$('#currentLab').append(`<span class="text-white">${s}</span>`)
+	}
+}); -->

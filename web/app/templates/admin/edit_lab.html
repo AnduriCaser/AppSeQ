@@ -1,0 +1,443 @@
+{% extends "layout.html" %}
+
+
+{% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+{% endblock header%}
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Edit Lab
+    <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+
+{% block nav_tag %}
+<div class="menu-item">
+    <a class="menu-link" href="{{url_for('admin.dashboard')}}">
+        <span class="menu-icon">
+            <i class="bi bi-house fs-3 text-white"></i>
+        </span>
+        <span class="menu-title text-white">Dashboard</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.profile')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">Profile</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">General Statistics</span>
+    </a>
+    <a class="menu-link" href="{{url_for('auth.logout')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-ranking-star"></i>
+        </span>
+        <span class="menu-title">Logout</span>
+    </a>
+</div>
+{% endblock nav_tag %}
+
+
+{% block content%}
+<div class="container">
+    {% if lab %}
+        <form method="post" action="{{url_for('admin.edit_labs',slug=lab.slug)}}" id="lab" class="form-floating">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <div id="deleteScreen" style="background-color: rgba(10,10,10,.86);" class="modal fade">
+                <div style="width: 65%!important;" class="modal-dialog modal-dialog-centered">
+                    <div style="background-color: #242424;border-radius: 5px;" class="modal-content border-0 text-white">
+                        <div class="modal-header border-0">
+                            <h5 class="modal-title">REMOVING MODULE</h5>
+                        </div>
+                        <div style="background-color: #1d1d1d;"
+                            class="modal-body d-flex justify-content-center align-items-center">
+                            <i style="color: #e45735;" class="fa-solid fa-circle-exclamation fa-2x mx-auto"></i>
+                            <p id="moduleContent" class="card-text mx-auto"></p>
+                        </div>
+                        <div class="modal-footer border-0">
+                            <button id="cancel" style="background-color: #303030;border-radius: 5px;" type="button"
+                                class="btn btn-sm text-white">Cancel</button>
+                            <button id="delete" style="background-color: #e45735;border-radius: 5px;" type="button"
+                                class="btn btn-sm text-white">Remove
+                                Module</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2 p-2">
+                <div class="col-md">
+                    <div class="d-flex flex-column justify-content-center align-items-center">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div style="background-color: #202020;border-radius: 5px;width: 100%;"
+                            class="d-flex justify-content-center align-items-center error mb-3">
+                            <i style="color: #bd3f2e;" class="fa-solid fa-circle-exclamation py-3 mx-2"></i>
+                            <p style="color: #bd3f2e;" class="card-text py-3 mx-2">
+                                {{message}}
+                            </p>
+                        </div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2 p-2">
+                <div class="col-md">
+                    <div class="d-flex flex-column justify-content-start align-items-start float-start">
+                        <h5 style="color: rgb(185, 185, 185);font-family: 'Source Sans Pro', sans-serif!important;"
+                            class="card-title">EDIT LAB</h5>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <h1 id="pointed" class="card-title text-white float-start mt-2">{{lab.name}}</h1>
+                                <span style="background-color: rgb(67, 66, 66);border-radius: 5px;" class="badge ms-3">{{lab.set_points()}} points</span>
+                            </div>
+                    </div>
+                    <div class="d-flex justify-content-center align-items-center float-end">
+                        <button id="addQuestion" type="button"
+                            style="background-color: rgb(67, 66, 66);border-radius: 5px;"
+                            class="btn btn-sm text-white mx-2">Add
+                            question</button>
+                        <button type="submit" style="background-color: #943124;border-radius: 5px;"
+                            class="btn btn-sm text-white mx-2">Update Lab Details</button>
+                    </div>
+                </div>
+            </div>
+            <div style="position: relative;" class="fv-row mt-2 p-2">
+                <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                    class="form-label fw-bolder p-0 px-5 mt-2">LAB NAME</label>
+                <input id="place_check"
+                    style="background-color: #202020;border-radius: 5px;font-size:12px;border-color: #e45735!important;"
+                    class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white pointer check_pointer" maxlength="60"
+                    name="lab_name" type="text" placeholder="Enter a lab name" value="{{lab.name}}">
+            </div>
+            <div style="position: relative;" class="fv-row mt-2 p-2">
+                <label for="place_check" style="color: #bd3f2e;position: absolute;font-size:smaller;"
+                    class="form-label fw-bolder p-0 px-5 mt-2">LAB DESCRIPTION</label>
+                <input id="place_check"
+                    style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                    class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="60" name="lab_description"
+                    type="text" placeholder="Enter lab description" value="{{lab.description}}">
+            </div>
+            <div style="position: relative;" class="fv-row mt-2 p-2">
+                <input hidden name="difficulty" type="text" value="{{lab.difficulty}}">
+                <div class="btn-group">
+                    <button style="background-color: #202020;border-radius: 5px;font-size:12px;" type="button"
+                        class="btn dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
+                        Difficulty : <span style="font-size:12px;" id="difficulty">{{lab.difficulty}}</span>
+                    </button>
+                    <ul style="background-color: #202020;border-radius: 5px;" class="dropdown-menu">
+                        <li><a class="dropdown-item text-white" href="#">1</a></li>
+                        <li><a class="dropdown-item text-white" href="#">2</a></li>
+                        <li><a class="dropdown-item text-white" href="#">3</a></li>
+                        <li><a class="dropdown-item text-white" href="#">4</a></li>
+                        <li><a class="dropdown-item text-white" href="#">5</a></li>
+                        <li><a class="dropdown-item text-white" href="#">6</a></li>
+                        <li><a class="dropdown-item text-white" href="#">7</a></li>
+                        <li><a class="dropdown-item text-white" href="#">8</a></li>
+                        <li><a class="dropdown-item text-white" href="#">9</a></li>
+                        <li><a class="dropdown-item text-white" href="#">10</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div style="position: relative;" class="fv-row mt-2 p-2">
+                <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                    class="form-label fw-bolder p-0 px-5 mt-2">MISSION STATEMENT</label>
+                <textarea id="place_check"
+                    style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;min-height: 220px;max-height: 350px;font-size:12px;"
+                    class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white"
+                    name="lab_mission_statement" type="text" placeholder="Enter mission statement">{{lab.mission_statement}}</textarea>
+            </div>
+            <div class="fv-row px-2 py-0">
+                <h3 class="card-title text-white mt-15">Questions</h3>
+            </div>
+            {% if lab.questions|length > 0 %}
+                {% for question in lab.questions  %}
+                    <section>
+                        <div style="margin-top: 30px;" class="fv-row p-2 mb-12">
+                            <div class="col-md float-start">
+                                <h5 style="color: rgb(185, 185, 185);font-family: 'Source Sans Pro', sans-serif!important;"
+                                    class="card-title ctitle">QUESTION {{++loop.index}}</h5>
+                            </div>
+                            <div class="col-md float-end">
+                                <button id="deleteChallenge" type="button" style="background-color: #e45735;border-radius: 5px;"
+                                    class="btn btn-sm text-white"><i class="fa-solid fa-minus text-white"></i> Delete
+                                    Module</button>
+                            </div>
+                        </div>
+                        <div style="position: relative;" class="fv-row mt-2 p-2">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION DESCRIPTION</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_description[]" type="text" placeholder="Enter question description" value="{{question.description}}">
+                        </div>
+                        <div style="position: relative;" class="fv-row mt-2 p-2">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION HINT</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_hint[]" type="text" placeholder="Enter a hint" value="{{question.hint}}">
+                        </div>
+                        <div style="position: relative;" class="fv-row mt-2 p-2">
+                            <div class="input-group">
+                                <span style="width: 50%;">
+                                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                        class="form-label fw-bolder p-0 px-5 mt-2">QUESTION POINT</label>
+                                    <input id="place_check"
+                                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                        name="question_point[]" type="text" placeholder="Enter question point" value="{{question.points}}">
+                                </span>
+                                <span style="width: 50%;" class="ps-3">
+                                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                        class="form-label fw-bolder p-0 px-5 mt-2">QUESTION VALUE</label>
+                                    <input id="place_check"
+                                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                        name="question_value[]" type="text" placeholder="Enter question value" value="{{question.answer}}">
+                                </span>
+                            </div>
+                        </div>
+                    </section>
+                {% endfor %}
+            {% else %}
+            {% endif %}
+            <div id="createButton" class="fv-row mt-5 p-2">
+                <div class="col-md float-end">
+                    <button id="send" type="submit" style="background-color: #943124;border-radius: 5px;"
+                        class="btn btn-sm text-white">Update Lab Details</button>
+                </div>
+            </div>
+        </form>
+    {% else %}
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+ {% if lab.questions|length > 0 %}
+    <script>
+        $(document).ready(function () {
+            number = {{lab.questions|length}}
+
+
+            $(".dropdown-item").on("mouseover", function () {
+                $(this).css({
+                    "background-color": "#943124"
+                })
+            }).on("mouseleave", function () {
+                $(this).css({
+                    "background-color": "#202020"
+                })
+            });
+
+            $(".dropdown-menu > li").click(function () {
+                diffculty = $(this).children("a").text()
+                $("#difficulty").text(diffculty);
+                $("input[name='difficulty']").val(diffculty);
+            });
+
+
+            $('#addQuestion').click(function () {
+                $('#lab').children(':last-child').before(`<section>
+                <div style="margin-top: 30px;" class="fv-row p-2 mb-12">
+                    <div class="col-md float-start">
+                        <h5 style="color: rgb(185, 185, 185);font-family: 'Source Sans Pro', sans-serif!important;"
+                            class="card-title ctitle">QUESTION ${++number}</h5>
+                    </div>
+                    <div class="col-md float-end">
+                        <button id="deleteChallenge" type="button" style="background-color: #e45735;border-radius: 5px;"
+                            class="btn btn-sm text-white"><i class="fa-solid fa-minus text-white"></i> Delete
+                            Module</button>
+                    </div>
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                        class="form-label fw-bolder p-0 px-5 mt-2">QUESION DESCRIPTION</label>
+                    <input id="place_check"
+                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                        name="question_description[]" type="text" placeholder="Enter question description">
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                        class="form-label fw-bolder p-0 px-5 mt-2">QUESTION HINT</label>
+                    <input id="place_check"
+                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                        name="question_hint[]" type="text" placeholder="Enter a hint">
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <div class="input-group">
+                        <span style="width: 50%;">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION POINT</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_point[]" type="text" placeholder="Enter question point">
+                        </span>
+                        <span style="width: 50%;" class="ps-3">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION VALUE</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_value[]" type="text" placeholder="Enter question value">
+                        </span>
+                    </div>
+                </div>
+            </section>`);
+            });
+
+
+
+            $(document).on('click', '#deleteChallenge', function () {
+                $('body').css("overflow-y", "hidden");
+                index = $('section').index($(this).parent().parent().parent());
+                $('#moduleContent').text(`Are you sure you want to remove Lab ${++index}`);
+                $('#deleteScreen').modal('show');
+            }).on('click', '#cancel', function () {
+                $('body').css("overflow-y", "scroll");
+                $('#deleteScreen').modal('hide');
+            }).on('click', '#delete', function () {
+                $('section').get(--index).remove();
+                $('section').each(function (i, el) {
+                    $(this).children().children().children('.ctitle').text(`QUESTION ${++i}`);
+                });
+
+                $('#deleteScreen').modal('hide');
+                number = $('section').length;
+
+            }).on('focusin', "#place_check", function () {
+                $(this).removeClass("border-0");
+            }).on('focusout', "#place_check", function () {
+                $(this).addClass("border-0");
+            });
+
+            $('.pointer').on('keydown', function () {
+                $('#pointed').text($(this).val());
+            }).on('keyup', function () {
+                $('#pointed').text($(this).val());
+            });
+
+
+        });
+    </script>
+ {% else %}
+    <script>
+        $(document).ready(function () {
+            number = 1;
+            $(".dropdown-item").on("mouseover", function () {
+                $(this).css({
+                    "background-color": "#943124"
+                })
+            }).on("mouseleave", function () {
+                $(this).css({
+                    "background-color": "#202020"
+                })
+            });
+
+            $(".dropdown-menu > li").click(function () {
+                diffculty = $(this).children("a").text();
+                $("#difficulty").text(diffculty);
+                $("input[name='difficulty']").val(diffculty);
+            });
+
+
+            $('#addQuestion').click(function () {
+                $('#lab').children(':last-child').before(`<section>
+                <div style="margin-top: 30px;" class="fv-row p-2 mb-12">
+                    <div class="col-md float-start">
+                        <h5 style="color: rgb(185, 185, 185);font-family: 'Source Sans Pro', sans-serif!important;"
+                            class="card-title ctitle">QUESTION ${number++}</h5>
+                    </div>
+                    <div class="col-md float-end">
+                        <button id="deleteChallenge" type="button" style="background-color: #e45735;border-radius: 5px;"
+                            class="btn btn-sm text-white"><i class="fa-solid fa-minus text-white"></i> Delete
+                            Module</button>
+                    </div>
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                        class="form-label fw-bolder p-0 px-5 mt-2">QUESION DESCRIPTION</label>
+                    <input id="place_check"
+                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                        name="question_description[]" type="text" placeholder="Enter question description">
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                        class="form-label fw-bolder p-0 px-5 mt-2">QUESTION HINT</label>
+                    <input id="place_check"
+                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                        class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                        name="question_hint[]" type="text" placeholder="Enter a hint">
+                </div>
+                <div style="position: relative;" class="fv-row mt-2 p-2">
+                    <div class="input-group">
+                        <span style="width: 50%;">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION POINT</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_point[]" type="text" placeholder="Enter question point">
+                        </span>
+                        <span style="width: 50%;" class="ps-3">
+                            <label for="place_check" style="color: #bd3f2e;position: absolute;font-size: smaller;"
+                                class="form-label fw-bolder p-0 px-5 mt-2">QUESTION VALUE</label>
+                            <input id="place_check"
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;font-size:12px;"
+                                class="form-control cy_shadow border-0 pt-8 pb-2 ps-5 text-white" maxlength="30"
+                                name="question_value[]" type="text" placeholder="Enter question value">
+                        </span>
+                    </div>
+                </div>
+            </section>`);
+            
+            });
+
+
+
+            $(document).on('click', '#deleteChallenge', function () {
+                $('body').css("overflow-y", "hidden");
+                index = $('section').index($(this).parent().parent().parent());
+                $('#moduleContent').text(`Are you sure you want to remove Lab ${++index}`);
+                $('#deleteScreen').modal('show');
+            }).on('click', '#cancel', function () {
+                $('body').css("overflow-y", "scroll");
+                $('#deleteScreen').modal('hide');
+            }).on('click', '#delete', function () {
+                $('section').get(--index).remove();
+                $('section').each(function (i, el) {
+                    $(this).children().children().children('.ctitle').text(`QUESTION ${++i}`);
+                });
+
+                $('#deleteScreen').modal('hide');
+                number = $('section').length + 1;
+
+            });
+
+            $('.pointer').on('keydown', function () {
+                $('#pointed').text($(this).val());
+            }).on('keyup', function () {
+                $('#pointed').text($(this).val());
+            });
+
+
+
+        });
+    </script>
+ {% endif %}
+
+{% endblock scripts %}
