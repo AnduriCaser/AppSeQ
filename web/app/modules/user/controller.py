@@ -5,6 +5,7 @@ from app.modules.user.models import *
 from app.db import db_session
 import re
 from werkzeug.utils import secure_filename
+import subprocess
 
 
 def allowed_file():
@@ -70,6 +71,23 @@ def delete(id):
 
     flash("Account deleted successfully", "success")
     return redirect(url_for('auth.logout'))
+
+
+@user.route("/labs/<string:slug>/start")
+@roles_accepted("user")
+@auth_required("session")
+def labs_start(slug):
+    lab = db_session.query(Lab).filter(Lab.slug == slug).one()
+    if lab:
+        pass
+
+
+
+@user.route("/labs/<string:slug>/stop")
+@roles_accepted("user")
+@auth_required("session")
+def labs_stop(slug):
+    pass
 
 
 @user.route('/leaderboard')
