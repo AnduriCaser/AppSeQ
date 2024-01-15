@@ -10,11 +10,20 @@ from flask_wtf.csrf import CSRFProtect
 import asyncio
 
 
+async def async_before_request():
+    await init_db()
+    await create_roles()
+    await create_admin()
+    await set_admin_role()
+    await create_labs()
+
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object("config")
 
     with app.app_context():
+        asyncio.run(async_before_request())
         from app.modules.auth.controller import auth
         from app.modules.user.controller import user
         from app.modules.admin.controller import admin
@@ -32,17 +41,3 @@ csrf = CSRFProtect(app)
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 security = Security(app, user_datastore)
 
-
-@app.before_request
-def before_request():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(async_before_request())
-
-
-async def async_before_request():
-    await init_db()
-    await create_roles()
-    await create_admin()
-    await set_admin_role()
-    await create_labs()

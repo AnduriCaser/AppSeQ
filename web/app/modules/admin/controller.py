@@ -158,7 +158,7 @@ def create_course():
                         return redirect(url_for("admin.create_course"))
 
             if status.get("result") == "success":
-                course = Course(course_name, None, course_description)
+                course = Course(course_name, course_description)
                 for challenge in challenges:
                     cy_challenge = Challenge(
                         challenge.get("name"), challenge.get("description")
@@ -175,8 +175,8 @@ def create_course():
                 flash("Course created successfully !", "success")
                 return redirect(url_for("admin.create_course"))
         except Exception as e:
+            print(e)
             res = {"error": "Something went wrong"}
-            print(res)
             return jsonify(res)
 
     return render_template("admin/course_create.html")

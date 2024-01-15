@@ -44,19 +44,19 @@ challenges_labs = Table(
     Column("lab_id", Integer, ForeignKey("labs.id")),
 )
 
-labs_categories = Table(
-    "labs_categories",
-    Base.metadata,
-    Column("labs_id", Integer, ForeignKey("labs.id")),
-    Column("category_id", Integer, ForeignKey("categories.id")),
-)
+# labs_categories = Table(
+#     "labs_categories",
+#     Base.metadata,
+#     Column("labs_id", Integer, ForeignKey("labs.id")),
+#     Column("category_id", Integer, ForeignKey("categories.id")),
+# )
 
-challenges_categories = Table(
-    "challenges_categories",
-    Base.metadata,
-    Column("challenge_id", Integer, ForeignKey("challenges.id")),
-    Column("category_id", Integer, ForeignKey("categories.id")),
-)
+# challenges_categories = Table(
+#     "challenges_categories",
+#     Base.metadata,
+#     Column("challenge_id", Integer, ForeignKey("challenges.id")),
+#     Column("category_id", Integer, ForeignKey("categories.id")),
+# )
 
 
 class User(Base, UserMixin):
@@ -102,12 +102,18 @@ class Course(Base):
         "Challenge", secondary=courses_challenges, backref=backref("courses")
     )
 
+    def __init__(self, name=None, description=None):
+        self.name = name
+        self.description = description
+
+    def get_challenges(self, course):
+        return [challenge.as_dict() for challenge in course.challenges]
+
 
 class Lab(Base):
     __tablename__ = "labs"
 
     id = Column(Integer, primary_key=True)
-    challenge_id = Column(Integer, ForeignKey("challenges.id"))
     user_id = Column(Integer, ForeignKey("users.id"))
     name = Column(String(100), nullable=False)
     description = Column(String(2555), nullable=True)
@@ -139,14 +145,14 @@ class Lab(Base):
         return " ".join(n_array)
 
 
-class Category(Base):
-    __tablename__ = "categories"
+# class Category(Base):
+#     __tablename__ = "categories"
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False)
-    description = Column(String(2555), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    labs = relationship("Challenge", backref=backref("category"))
+#     id = Column(Integer, primary_key=True)
+#     name = Column(String(50), nullable=False)
+#     description = Column(String(2555), nullable=True)
+#     created_at = Column(DateTime, default=datetime.utcnow)
+#     labs = relationship("Challenge", backref=backref("category"))
 
 
 class SolvedChallenge(Base):
@@ -173,19 +179,27 @@ class Challenge(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(100), nullable=False)
     description = Column(String(2555), nullable=False)
-    difficulty = Column(String(20), nullable=False)
+    difficulty = Column(String(20))
     points = Column(Integer, default=0)
-    lab_id = Column(Integer, ForeignKey("labs.id"), nullable=False)
-    category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
-    flag = Column(String(50), nullable=False)
+    #category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     release_date = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
+    labs = relationship("Lab", secondary=challenges_labs, backref=backref("challenges"))
 
     stages = relationship("ChallengeStage", backref=backref("challenge"))
     comments = relationship("Comment", backref=backref("challenge"))
     solvers = relationship("SolvedChallenge", backref=backref("challenge"))
 
-    def get_points():
+    def __init__(self, name=None, description=None, difficulty=None, points=None):
+        self.name = name
+        self.description = description
+        self.difficulty = difficulty
+        self.points = points
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def get_points(self):
         # Get total labs points and set it !
         pass
 
