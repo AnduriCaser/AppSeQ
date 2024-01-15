@@ -52,7 +52,7 @@ def dashboard():
         page=page,
         per_page=per_page,
         total=labs_count,
-        courses = courses,
+        courses=courses,
         offset=offset,
         css_framework="bootstrap5",
         show_single_page=True,
@@ -73,6 +73,12 @@ def profile():
     return render_template("admin/profile.html")
 
 
+def get_labs(page, per_page=3):
+    offset = (page - 1) * per_page
+    labs = db_session.query(Lab).limit(per_page).offset(offset)
+    return [lab.as_dict() for lab in labs]
+
+
 @admin.route("/api/labs", methods=["GET", "POST"])
 @auth_required("session")
 @roles_accepted("administrator")
@@ -80,24 +86,19 @@ def api_labs():
     try:
         if request.method == "POST":
             data = request.get_json()
-            result = []
-            for name in data:
-                if db_session.query(Lab).filter(Lab.name == name).first():
-                    lab = db_session.query(Lab).filter(Lab.name == name).first()
-                    result.append(lab.as_dict())
+            if not data:
+                return jsonify({"error": "Invalid input format"}), 400
 
+            result = (
+                get_labs(data.get("page", 1))
+                if isinstance(data, dict)
+                else [
+                    lab.as_dict()
+                    for lab in db_session.query(Lab).filter(Lab.name.in_(data)).all()
+                ]
+            )
             return jsonify(result)
 
-        if request.method == "GET":
-            page = request.args.get("page", type=int, default=1)
-            per_page = request.args.get("perPage", type=int, default=1)
-            offset = (page - 1) * per_page
-            result = []
-            labs = db_session.query(Lab).limit(per_page).offset(offset)
-            for ix in labs:
-                result.append(ix.as_dict())
-
-            return jsonify(result)
     except Exception as e:
         status = {"error": "Something went wrong"}
         return jsonify(status)

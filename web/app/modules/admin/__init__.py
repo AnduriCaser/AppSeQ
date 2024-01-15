@@ -16,13 +16,13 @@ ADMIN = {
 }
 
 LABS = [
-    {"name": "RXSS 1", "url": "http://localhost:8001"},
-    {"name": "RXSS 2", "url": "http://localhost:8002"},
-    {"name": "RXSS 3", "url": "http://localhost:8003"},
+    {"name": "Union Based SQL Injection", "url": "http://localhost:3000"},
+    {"name": "JWT None Algorithm", "url": "None"},
+    {"name": "Web Cache Poisoning", "url": "None"},
 ]
 
 
-def create_labs():
+async def create_labs():
     if db_session.query(Lab).count() == 0:
         for g in LABS:
             lab = Lab(name=g.get("name"), url=g.get("url"))
@@ -30,7 +30,7 @@ def create_labs():
             db_session.commit()
 
 
-def create_admin():
+async def create_admin():
     if not user_datastore.find_user(email=ADMIN.get("email")):
         user_datastore.create_user(
             username=ADMIN.get("username"),
@@ -41,7 +41,7 @@ def create_admin():
         db_session.commit()
 
 
-def set_admin_role():
+async def set_admin_role():
     if not user_datastore.find_user(email=ADMIN.get("email")).has_role("administrator"):
         user = user_datastore.find_user(email=ADMIN.get("email"))
         role = user_datastore.find_role("administrator")

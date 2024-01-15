@@ -114,6 +114,7 @@ class Lab(Base):
     points = Column(Integer, default=0)
     difficulty = Column(Integer, default=0)
     slug = Column(String(255), default=uuid.uuid4().hex)
+    static = Column(Boolean())
     mission_statement = Column(String(3000))
     url = Column(String(255))
     description = Column(String(2000))
@@ -212,6 +213,7 @@ class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True)
     lab_id = Column(Integer, ForeignKey("labs.id"))
+    line_number = Column(Integer())
     description = Column(String(2555))
     hint = Column(String(2555))
     answer = Column(String(255), unique=True)

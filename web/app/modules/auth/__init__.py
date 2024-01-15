@@ -7,7 +7,7 @@ user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 ROLES = [{"name": "administrator"}, {"name": "user"}]
 
 
-def create_roles():
+async def create_roles():
     if db_session.query(Role).count() != len(ROLES):
         for role in ROLES:
             user_datastore.create_role(name=role.get("name"))
