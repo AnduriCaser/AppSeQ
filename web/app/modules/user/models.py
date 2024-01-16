@@ -119,7 +119,7 @@ class Lab(Base):
     description = Column(String(2555), nullable=True)
     points = Column(Integer, default=0)
     difficulty = Column(Integer, default=0)
-    slug = Column(String(255), default=uuid.uuid4().hex)
+    slug = Column(String(255), default=lambda: uuid.uuid4().hex, unique=True)
     static = Column(Boolean())
     mission_statement = Column(String(3000))
     url = Column(String(255))

@@ -1,38 +1,51 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
+const { initializeDatabase, isTableEmpty, main } = require("./db");
+
 const port = 3000;
 const app = express();
 
+let conn;
 
-var db = new sqlite3.Database(process.env.DB_FILE);
+(async () => {
+  try {
+    conn = await initializeDatabase();
+    const tableEmpty = await isTableEmpty(conn);
 
-const getProduct = async (product_name, callback) => {
-    const query = `SELECT name, description, price from products where name='${product_name}'`;
+    if (tableEmpty) {
+      await main(conn);
+    }
+  } catch (error) {
+    console.error("Error initializing the database:", error);
+    process.exit(1);
+  }
+})();
 
-
-    db.all(query, (err, rows) => {
-        callback(rows);
-    });
+const getUser = async (username) => {
+  const [rows, fields] = await conn.query(
+    `SELECT username, email FROM users WHERE username='${username}'`
+  );
+  return rows;
 };
 
+app.get("/search", async (req, res) => {
+  try {
+    const { username } = req.query;
+    const result = await getUser(username);
 
-
-app.post('/search', async (req, res) => {
-    const { productName } = req.body;
-    await getProduct(productName, async (product) => {
-        if (product) return res.type('json').send(JSON.stringify(product, null, 2) + '\n');
-        return res.json({ status: 'Product not found' });
-    });
+    if (result.length > 0) {
+      return res.type("json").json(result);
+    }
+    return res.json({ status: "User not found" });
+  } catch (error) {
+    console.error("Error:", error);
+    return res.status(500).json({ error: error });
+  }
 });
 
-
-
-
-app.all('*', (req, res) => {
-    return res.sendStatus(404);
+app.all("*", (req, res) => {
+  return res.sendStatus(404);
 });
-
 
 app.listen(port, () => {
-    console.log(`App listening on ${port}`);
-})
+  console.log(`App listening on ${port}`);
+});

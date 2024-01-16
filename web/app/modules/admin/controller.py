@@ -245,6 +245,7 @@ def labs(slug):
     return render_template("admin/lab.html", lab=lab)
 
 
+# Sabah kalkınca bu kısmı hallet Hata var
 @admin.route("/labs/<string:slug>/edit", methods=["GET", "POST"])
 @auth_required("session")
 @roles_accepted("administrator")

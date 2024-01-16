@@ -19,6 +19,8 @@ from flask_security import (
     current_user,
     roles_required,
 )
+
+from flask_paginate import Pagination, get_page_parameter
 from app.modules.admin import hash_password
 from app.modules.user.models import *
 from app.db import db_session
@@ -39,7 +41,19 @@ user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 @roles_accepted("user")
 @auth_required("session")
 def dashboard():
-    return render_template("user/dashboard.html")
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    per_page = 1
+    offset = (page - 1) * per_page
+    courses_count = db_session.query(Course).count()
+    labs_count = db_session.query(Lab).count()
+    courses = db_session.query(Course).limit(per_page).offset(offset)
+    labs = db_session.query(Lab).limit(per_page).offset(offset)
+    
+    return render_template(
+        "user/dashboard.html",
+        courses=courses,
+        labs=labs,
+    )
 
 
 @user.route("/profile")
@@ -49,7 +63,7 @@ def profile():
     return render_template(
         "user/profile.html",
         username=current_user.username,
-        points=current_user.points,
+        points=30,
         invite_code=current_user.code_rgstr,
     )
 
@@ -107,7 +121,8 @@ def delete(id):
 @roles_accepted("user")
 @auth_required("session")
 def view_lab(slug):
-    pass
+    lab = db_session.query(Lab).filter(Lab.slug == slug).first()
+    return render_template("user/dynamic_lab_details.html",lab=lab)
 
 
 @user.route("/labs/<string:slug>/start")
@@ -115,7 +130,7 @@ def view_lab(slug):
 @auth_required("session")
 def labs_start(slug):
     lab = db_session.query(Lab).filter(Lab.slug == slug).one()
-    if lab and lab.static:
+    if lab and lab.static is not False:
         pass
 
 

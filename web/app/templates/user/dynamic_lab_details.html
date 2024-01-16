@@ -1,9 +1,163 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body></body>
-</html>
+{% extends "layout.html" %}
+
+
+{% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap" rel="stylesheet">
+{% endblock header %}
+
+
+{% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">Labs
+    <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %}
+
+{% block nav_tag %}
+<div class="menu-item">
+    <a class="menu-link active" href="{{url_for('admin.dashboard')}}">
+        <span class="menu-icon">
+            <i class="bi bi-house fs-3 text-white"></i>
+        </span>
+        <span class="menu-title text-white">Dashboard</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.profile')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">Profile</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-user"></i>
+        </span>
+        <span class="menu-title">General Statistics</span>
+    </a>
+    <a class="menu-link" href="{{url_for('auth.logout')}}">
+        <span class="menu-icon">
+            <i class="fa-solid fa-ranking-star"></i>
+        </span>
+        <span class="menu-title">Logout</span>
+    </a>
+</div>
+{% endblock nav_tag %}
+
+{% block content %}
+<div class="container">
+    {% if lab %}
+        <div class="row mt-2 p-2">
+            <div style="font-family: Source Sans Pro,sans-serif!important;" class="col-md text-white">
+                <h1 style="font-size: 25px;" class="card-title">{{lab.name}}</h1>
+                <p style="font-size: 10px;color: rgb(185,185,185);" class="card-text fw-bolder">{{lab.description}}</p>
+            </div>
+            <div class="col-md">
+                <div class="float-end">
+                    <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}" style="background-color: #943124!important;color: white;border-radius: 5px;"
+                        class="btn btn-sm">
+                        <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
+                        <span class="text-center fw-bolder">Start The Lab</span>
+                    </a>
+                    <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}" style="background-color: #333!important;color: white;border-radius: 5px;"
+                        class="btn btn-sm">
+                        <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
+                        <span class="text-center fw-bolder">Stop The Lab</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div style="width: 28%;" class="row g-0 mt-6 p-2">
+            <div class="col-md p-0">
+                <div class="float-start d-flex justify-content-center align-items-center">
+                    <i style="font-size: 10px;" class="fa-solid fa-clock"></i>
+                    <p style="font-size: 10px;color: rgb(185,185,185);" class="card-text ms-2">15-45 <span
+                            style="font-size: 10px;color: gray;">Minutes</span></p>
+                </div>
+            </div>
+            <div class="col-md p-0 ms-4">
+                <div class="float-start d-flex justify-content-center align-items-center">
+                    <i style="font-size: 10px;color: rgb(185,185,185);" class="fa-solid fa-bullseye"></i>
+                    <p style="font-size: 10px;color: rgb(185,185,185);" class="card-text ms-2">{{lab.points}} <span
+                            style="color: gray;font-size: 10px;">points</span></p>
+                </div>
+            </div>
+            <div class="col-md p-0 me-15">
+                <div class="float-start d-flex justify-content-center align-items-center">
+                    <p style="font-size: 10px;color: rgb(185,185,185);" class="card-text">{{lab.difficulty}}/10 <span
+                            style="color: gray;font-size: 10px;">Difficulty</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-12 px-2 py-0">
+            <div class="col-md p-0">
+                <div class="float-start">
+                    <ul id="listing" class="d-flex justify-content-start align-items-start mb-0 py-0 px-1"
+                        style="list-style-type: none;font-family: Source Sans Pro,sans-serif!important;">
+                        <li style="cursor: pointer;" class="li_active mx-2 py-4">
+                            <i class="item_active fa-solid fa-list-check"></i>
+                            <span class="item_active ms-1">Mission Statement</span>
+                        </li>
+                        <li style="cursor: pointer;" class="mx-2 py-4">
+                            <i class="fa-solid fa-flag item_deactive"></i>
+                            <span class="ms-1 item_deactive">Verify Flags</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="row py-0 px-4 animate_box">
+            <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                class="col-md p-0">
+                <p class="card-text text-white p-8">{{lab.mission_statement}}</p>
+            </div>
+        </div>
+        {% if lab.questions|length > 0 %}
+            {% for question in lab.questions  %}
+                <div style="display: none;" class="row py-0 px-4 animate_box">
+                    <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                        class="col-md p-0">
+                        <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.description}}</p>
+                        <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
+                            <input disabled
+                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
+                                class="form-control" type="text" value="{{question.answer}}">
+                            <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
+                            <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.points}} points
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        {% endif %}
+    {% else %}
+    {% endif %}
+</div>
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+
+        $("#listing>li").click(function (e) {
+            self = $(this);
+            if (!self.hasClass("li_active")) {
+                $("li").removeClass("li_active");
+                $("li").children().removeClass("item_active");
+                $("li").children().addClass("item_deactive");
+                self.children().removeClass("item_deactive");
+                self.addClass("li_active");
+                self.children().addClass("item_active");
+
+
+                $(".animate_box").not($(".animate_box").get(self.index())).fadeOut(200, function () {
+                    $($(".animate_box").get(self.index())).fadeIn(200);
+                });
+
+            };
+        });
+
+
+    });
+</script>
+{% endblock scripts %}

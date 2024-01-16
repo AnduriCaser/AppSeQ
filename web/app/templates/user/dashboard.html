@@ -11,6 +11,47 @@
 </h1>
 {% endblock header_tag %}
 
+
+
+{% block sidebar %}
+{% for course  in courses %}
+<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+    <span class="menu-link">
+        <span class="menu-icon">
+            <i class="bi bi-archive fs-3"></i>
+        </span>
+        <span class="menu-title">{{course.name}}</span>
+        <span class="menu-arrow"></span>
+    </span>
+    {% for challenge in course.challenges %}
+    <div class="menu-sub menu-sub-accordion menu-active-bg">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+            <span class="menu-link">
+                <span class="menu-bullet">
+                    <span class="bullet bullet-dot"></span>
+                </span>
+                <span class="menu-title">{{challenge.name}}</span>
+                <span class="menu-arrow"></span>
+            </span>
+            {% for lab in challenge.labs  %}
+            <div class="menu-sub menu-sub-accordion menu-active-bg">
+                <div class="menu-item">
+                    <a class="menu-link" href="{{url_for('user.view_lab',slug=lab.slug)}}">
+                        <span class="menu-bullet">
+                            <span class="bullet bullet-dot"></span>
+                        </span>
+                        <span class="menu-title">{{lab.name}}</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+{% endblock sidebar %}
+
 {% block nav_tag%}
 <div class="menu-item">
 	<a class="menu-link active" href="{{url_for('user.dashboard')}}">
