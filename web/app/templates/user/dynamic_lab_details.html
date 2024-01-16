@@ -51,6 +51,7 @@
                 <h1 style="font-size: 25px;" class="card-title">{{lab.name}}</h1>
                 <p style="font-size: 10px;color: rgb(185,185,185);" class="card-text fw-bolder">{{lab.description}}</p>
             </div>
+            {% if lab.static == False%}
             <div class="col-md">
                 <div class="float-end">
                     <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}" style="background-color: #943124!important;color: white;border-radius: 5px;"
@@ -65,6 +66,7 @@
                     </a>
                 </div>
             </div>
+            {% endif %}
         </div>
         <div style="width: 28%;" class="row g-0 mt-6 p-2">
             <div class="col-md p-0">
@@ -100,6 +102,12 @@
                         <li style="cursor: pointer;" class="mx-2 py-4">
                             <i class="fa-solid fa-flag item_deactive"></i>
                             <span class="ms-1 item_deactive">Verify Flags</span>
+                        </li>
+                        <li style="cursor: pointer;" class="mx-2 py-4">
+                            <a href="{{ url_for('user.download_lab_source_code', slug=lab.slug) }}">
+                                <i class="fa-solid fa-download item_deactive"></i>
+                                <span class="ms-1 item_deactive">Download Lab Source Code</span>
+                            </a>
                         </li>
                     </ul>
                 </div>

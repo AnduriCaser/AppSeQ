@@ -9,6 +9,8 @@ from flask import (
     Response,
     current_app,
     flash,
+    send_from_directory,
+    jsonify,
 )
 from flask_security import (
     auth_required,
@@ -48,7 +50,7 @@ def dashboard():
     labs_count = db_session.query(Lab).count()
     courses = db_session.query(Course).limit(per_page).offset(offset)
     labs = db_session.query(Lab).limit(per_page).offset(offset)
-    
+
     return render_template(
         "user/dashboard.html",
         courses=courses,
@@ -122,7 +124,7 @@ def delete(id):
 @auth_required("session")
 def view_lab(slug):
     lab = db_session.query(Lab).filter(Lab.slug == slug).first()
-    return render_template("user/dynamic_lab_details.html",lab=lab)
+    return render_template("user/dynamic_lab_details.html", lab=lab)
 
 
 @user.route("/labs/<string:slug>/start")
@@ -151,6 +153,18 @@ def submit_answer(slug):
         pass
     else:
         pass
+
+
+@user.route("/labs/<string:slug>/download", methods=["GET"])
+@roles_accepted("user")
+@auth_required("session")
+def download_lab_source_code(slug):
+    lab = db_session.query(Lab).filter(Lab.slug == slug).one()
+    if lab and lab.static == True:
+        return send_from_directory(lab.folder, "index.js", as_attachment=True)
+    else:
+        res = {"error": "Something went wrong"}
+        return jsonify(res)
 
 
 @user.route("/leaderboard")

@@ -96,7 +96,7 @@ class Course(Base):
     __tablename__ = "courses"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(255), nullable=False)
     description = Column(String(2555), nullable=True)
     challenges = relationship(
         "Challenge", secondary=courses_challenges, backref=backref("courses")
@@ -115,12 +115,13 @@ class Lab(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"))
-    name = Column(String(100), nullable=False)
+    name = Column(String(255), nullable=False)
     description = Column(String(2555), nullable=True)
     points = Column(Integer, default=0)
     difficulty = Column(Integer, default=0)
     slug = Column(String(255), default=lambda: uuid.uuid4().hex, unique=True)
     static = Column(Boolean())
+    folder = Column(String(2555))
     mission_statement = Column(String(3000))
     url = Column(String(255))
     description = Column(String(2000))

@@ -100,7 +100,7 @@
                 </div>
             </div>
         </div>
-        <div class="row py-0 px-4 animate_box">
+        <div class="row py-0 px-4 mission_animate_box">
             <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
                 class="col-md p-0">
                 <p class="card-text text-white p-8">{{lab.mission_statement}}</p>
@@ -108,8 +108,8 @@
         </div>
         {% if lab.questions|length > 0 %}
             {% for question in lab.questions  %}
-                <div style="display: none;" class="row py-0 px-4 animate_box">
-                    <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                <div style="display: none;" class="row py-0 px-4 questions_animate_box">
+                    <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
                         class="col-md p-0">
                         <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.description}}</p>
                         <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
@@ -145,9 +145,19 @@
                 self.children().addClass("item_active");
 
 
-                $(".animate_box").not($(".animate_box").get(self.index())).fadeOut(200, function () {
-                    $($(".animate_box").get(self.index())).fadeIn(200);
-                });
+                $(".mission_animate_box, .lab_animate_box").hide();
+
+                if (self.index() === 0) {
+                    $(".questions_animate_box").fadeOut(400,function(){
+                        $(".mission_animate_box").fadeIn(400);
+                    });
+                    
+                } else if (self.index() === 1) {
+                    $(".mission_animate_box").fadeOut(400,function(){
+                        $(".questions_animate_box").fadeIn(400);
+                    });
+                }
+
 
             };
         });

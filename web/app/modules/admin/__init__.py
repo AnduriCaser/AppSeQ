@@ -4,10 +4,15 @@ from app.db import db_session
 from slugify import slugify
 import hashlib
 import uuid
-
+import os
 
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 
+
+basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../../../../labs"))
+
+
+print(basedir)
 
 ADMIN = {
     "username": "admin",
@@ -16,16 +21,31 @@ ADMIN = {
 }
 
 LABS = [
-    {"name": "Union Based SQL Injection", "url": "http://localhost:3000"},
-    {"name": "JWT None Algorithm", "url": "None"},
-    {"name": "Web Cache Poisoning", "url": "None"},
+    {
+        "name": "Union Based SQL Injection",
+        "url": "http://localhost:3000",
+        "folder": "None",
+        "static": False,
+    },
+    {"name": "JWT 1", "url": "None", "folder": f"{basedir}/JWT 1", "static": True},
+    {
+        "name": "Cache Poisoning",
+        "url": "None",
+        "folder": f"{basedir}/Union_Based_SQL_Injection",
+        "static": True,
+    },
 ]
 
 
 async def create_labs():
     if db_session.query(Lab).count() == 0:
         for g in LABS:
-            lab = Lab(name=g.get("name"), url=g.get("url"))
+            lab = Lab(
+                name=g.get("name"),
+                url=g.get("url"),
+                folder=g.get("folder"),
+                static=g.get("static"),
+            )
             db_session.add(lab)
             db_session.commit()
 

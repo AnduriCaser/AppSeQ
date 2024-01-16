@@ -300,7 +300,7 @@ def edit_labs(slug):
                 return redirect(url_for("admin.edit_labs", slug=lab.slug))
 
         for value in question_values:
-            if not value or not re.match("^[A-Za-z0-9ığüşöçİĞÜŞÖÇ\w.\w,\s]*$", value):
+            if not value or not re.match("^[\w]*$", value):
                 flash("Invalid question value !", "danger")
                 return redirect(url_for("admin.edit_labs", slug=lab.slug))
             else:
