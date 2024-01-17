@@ -18,6 +18,8 @@ from flask_security import (
     roles_accepted,
     login_required,
 )
+from sqlalchemy.orm.exc import NoResultFound
+
 from app.db import db_session
 from app.modules.user.models import users_roles
 from app.modules.user.models import Role, User
@@ -39,6 +41,7 @@ def dashboard():
     courses_count = db_session.query(Course).count()
     labs_count = db_session.query(Lab).count()
     courses = db_session.query(Course).limit(per_page).offset(offset)
+    full_courses = db_session.query(Course).all()
     labs = db_session.query(Lab).limit(per_page).offset(offset)
     course_paginate = Pagination(
         page=page,
@@ -63,6 +66,7 @@ def dashboard():
         lab_paginate=lab_paginate,
         courses=courses,
         labs=labs,
+        full_courses = full_courses
     )
 
 
@@ -245,93 +249,65 @@ def labs(slug):
     return render_template("admin/lab.html", lab=lab)
 
 
-# Sabah kalkınca bu kısmı hallet Hata var
 @admin.route("/labs/<string:slug>/edit", methods=["GET", "POST"])
 @auth_required("session")
 @roles_accepted("administrator")
 def edit_labs(slug):
-    lab = db_session.query(Lab).filter(Lab.slug == slug).first()
-    labs = db_session.query(Lab)
-    status = {}
+    try:
+        lab = db_session.query(Lab).filter_by(slug=slug).one()
+    except NoResultFound:
+        flash("Lab not found", "danger")
+        return redirect(url_for("admin.labs"))
 
     if request.method == "POST":
-        lab_name = request.form.get("lab_name")
-        lab_description = request.form.get("lab_description")
-        lab_difficulty = request.form.get("difficulty")
-        lab_mission_statement = request.form.get("lab_mission_statement")
-        question_descriptions = request.form.getlist("question_description[]")
-        question_hints = request.form.getlist("question_hint[]")
-        question_values = request.form.getlist("question_value[]")
-        question_points = request.form.getlist("question_point[]")
 
-        if not lab_name or not re.match("^[A-Za-z0-9\s]*$", lab_name):
-            flash("Invalid lab name !", "danger")
+        def is_valid_input(value, regex, message):
+            if not (value and regex.match(value)):
+                flash(message, "danger")
+                return False
+            return True
+
+        input_fields = [
+            ("lab_name", r"^[A-Za-z0-9\s]*$", "Invalid lab name!"),
+            (
+                "lab_description",
+                r"^[A-Za-z0-9\s\.,!?'\"\-\(\)]*$",
+                "Invalid lab description!",
+            ),
+            ("difficulty", r"^[0-9]|10$", "Invalid lab difficulty!"),
+            (
+                "lab_mission_statement",
+                r"^[A-Za-z0-9\s\.,!/=?'\"\-\(\)]*$",
+                "Invalid lab mission statement!",
+            ),
+        ]
+
+        input_checks = [
+            is_valid_input(request.form[field], re.compile(pattern), message)
+            for field, pattern, message in input_fields
+        ]
+
+        if not all(input_checks):
             return redirect(url_for("admin.edit_labs", slug=lab.slug))
+        
 
-        if not lab_description or not re.match("^[A-Za-z0-9\s]*$", lab_description):
-            flash("Invalid lab description !", "danger")
-            return redirect(url_for("admin.edit_labs", slug=lab.slug))
+        field_names = ["question_description", "question_hint", "question_value", "question_point"]
+        
+        
+        lab.update({attr: request.form.get(f) for attr, f in [("name", "lab_name"), ("description", "lab_description"), ("difficulty", "difficulty"), ("mission_statement", "lab_mission_statement")]})
 
-        if not lab_difficulty or not re.match("^([0-9]|10)$", lab_difficulty):
-            flash("Invalid lab difficulty !", "danger")
-            return redirect(url_for("admin.edit_labs", slug=lab.slug))
+    
+        lab.questions = [
+            Question(
+                **{field: request.form.getlist(field + '[]')[i] for field in field_names}
+            )
+            for i in range(len(request.form.getlist(f"{field_names[0]}[]")))
+        ]
 
-        if not lab_mission_statement or not re.match(
-            "^[A-Za-z0-9ığüşöçİĞÜŞÖÇ\w.\w,\s]*$", lab_mission_statement
-        ):
-            flash("Invalid lab mission statement !", "danger")
-            return redirect(url_for("admin.edit_labs", slug=lab.slug))
+        db_session.commit()
 
-        for description in question_descriptions:
-            if not description or not re.match(
-                "^[A-Za-z0-9ığüşöçİĞÜŞÖÇ\w.\w,\s]*$", description
-            ):
-                flash("Invalid question description !", "danger")
-                return redirect(url_for("admin.edit_labs", slug=lab.slug))
-
-        for hint in question_hints:
-            if not re.match("^[A-Za-z0-9ığüşöçİĞÜŞÖÇ\w.\w,\s]*$", hint):
-                flash("Invalid question hint !", "danger")
-                return redirect(url_for("admin.edit_labs", slug=lab.slug))
-
-        for point in question_points:
-            if not point or not re.match("^[0-9]+$", point):
-                flash("Invalid question point !", "danger")
-                return redirect(url_for("admin.edit_labs", slug=lab.slug))
-
-        for value in question_values:
-            if not value or not re.match("^[\w]*$", value):
-                flash("Invalid question value !", "danger")
-                return redirect(url_for("admin.edit_labs", slug=lab.slug))
-            else:
-                status.__setitem__("result", "success")
-
-        if status.get("result") == "success":
-            if len(lab.questions) > 0:
-                for question in lab.questions:
-                    db_session.delete(question)
-
-                db_session.commit()
-
-            lab.name = lab_name
-            lab.description = lab_description
-            lab.difficulty = lab_difficulty
-            lab.mission_statement = lab_mission_statement
-
-            for i in range(0, len(question_descriptions)):
-                question = Question(
-                    question_descriptions[i],
-                    question_hints[i],
-                    question_values[i],
-                    question_points[i],
-                )
-
-                lab.questions.append(question)
-                db_session.add(question)
-            # lab.set_points()
-            db_session.commit()
-
-            return redirect(url_for("admin.labs", slug=lab.slug))
+        flash("Lab edited successfully!", "success")
+        return redirect(url_for("admin.labs", slug=lab.slug))
 
     return render_template("admin/edit_lab.html", lab=lab)
 

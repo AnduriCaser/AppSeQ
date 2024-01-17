@@ -54,12 +54,12 @@
             {% if lab.static == False%}
             <div class="col-md">
                 <div class="float-end">
-                    <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}" style="background-color: #943124!important;color: white;border-radius: 5px;"
+                    <a href="{{url_for('user.labs_start',slug=lab.slug)}}" style="background-color: #943124!important;color: white;border-radius: 5px;"
                         class="btn btn-sm">
                         <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
                         <span class="text-center fw-bolder">Start The Lab</span>
                     </a>
-                    <a href="{{url_for('admin.edit_labs',slug=lab.slug)}}" style="background-color: #333!important;color: white;border-radius: 5px;"
+                    <a href="{{url_for('user.labs_stop',slug=lab.slug)}}" style="background-color: #333!important;color: white;border-radius: 5px;"
                         class="btn btn-sm">
                         <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
                         <span class="text-center fw-bolder">Stop The Lab</span>
@@ -103,39 +103,93 @@
                             <i class="fa-solid fa-flag item_deactive"></i>
                             <span class="ms-1 item_deactive">Verify Flags</span>
                         </li>
+                        {% if lab.static == True%}
                         <li style="cursor: pointer;" class="mx-2 py-4">
                             <a href="{{ url_for('user.download_lab_source_code', slug=lab.slug) }}">
                                 <i class="fa-solid fa-download item_deactive"></i>
                                 <span class="ms-1 item_deactive">Download Lab Source Code</span>
                             </a>
                         </li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>
         </div>
-        <div class="row py-0 px-4 animate_box">
+        <div class="row py-0 px-4 mission_animate_box">
             <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
                 class="col-md p-0">
                 <p class="card-text text-white p-8">{{lab.mission_statement}}</p>
             </div>
         </div>
         {% if lab.questions|length > 0 %}
+
             {% for question in lab.questions  %}
-                <div style="display: none;" class="row py-0 px-4 animate_box">
-                    <div style="height: 400px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
-                        class="col-md p-0">
-                        <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.description}}</p>
-                        <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
-                            <input disabled
-                                style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
-                                class="form-control" type="text" value="{{question.answer}}">
-                            <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
-                            <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.points}} points
-                            </p>
+                {% if solved_lab.questions|length >0 %}
+                    {% for q_solved in solved_lab.questions  %}
+                        {% if q_solved.id == question.id %}
+                            <div style="display: none;" class="row py-0 px-4 questions_animate_box">
+                                <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                                    class="col-md p-0">
+                                    <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
+                                    <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
+                                        <input disabled type="hidden" type="text" value="{{question.id}}">
+                                        <input disabled
+                                            style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
+                                            class="form-control" type="text" value="{{question.question_value}}">
+                                        <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
+                                        <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div style="display: none;" class="row py-0 px-4 questions_animate_box">
+                                <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                                    class="col-md p-0">
+                                    <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
+                                    <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
+                                        <input type="hidden" type="text" value="{{question.id}}">
+                                        <input
+                                            style="background-color: #202020;border-radius: 5px;color: white;"
+                                            class="form-control" type="text" value="">
+                                        <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
+                                        <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <div style="display: none;" class="row py-0 px-4 questions_animate_box">
+                        <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                            class="col-md p-0">
+                            <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
+                            <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
+                                <input type="hidden" type="text" value="{{question.id}}">
+                                <input
+                                    style="background-color: #202020;border-radius: 5px;color: white;"
+                                    class="form-control" type="text" value="">
+                                <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
+                                <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
+                                </p>
+                            </div>
                         </div>
+                </div>
+                {% endif %}
+               
+            {% endfor %}
+            <div class="row mt-2 p-2">
+                <div class="col-md">
+                    <div class="float-end">
+                        <button id="send_answer" style="background-color: #943124!important;color: white;border-radius: 5px;"
+                            class="btn btn-sm">
+                            <i style="color: white;" class="fa-solid fa-pen-to-square"></i>
+                            <span class="text-center fw-bolder">Submit</span>
+                        </button>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
         {% else %}
         {% endif %}
     {% else %}
@@ -146,6 +200,8 @@
 {% block scripts %}
 <script>
     $(document).ready(function () {
+
+        answers = [];
 
         $("#listing>li").click(function (e) {
             self = $(this);
@@ -158,14 +214,57 @@
                 self.children().addClass("item_active");
 
 
-                $(".animate_box").not($(".animate_box").get(self.index())).fadeOut(200, function () {
-                    $($(".animate_box").get(self.index())).fadeIn(200);
-                });
+                $(".mission_animate_box, .lab_animate_box").hide();
+
+                if (self.index() === 0) {
+                    $(".questions_animate_box").fadeOut(400,function(){
+                        $(".mission_animate_box").fadeIn(400);
+                    });
+                    
+                } else if (self.index() === 1) {
+                    $(".mission_animate_box").fadeOut(400,function(){
+                        $(".questions_animate_box").fadeIn(400);
+                    });
+                }
+
 
             };
         });
 
-
+        $("#send_answer").click(function () {
+            _csrf = "{{csrf_token()}}";
+      
+      
+            $(".questions_animate_box input[type='hidden']").each(function(index, element) {
+                var questionId = $(element).val();
+    
+                var questionValue = $(element).siblings(".form-control").val();
+    
+                answers.push({
+                    id: questionId,
+                    question_value: questionValue
+                });
+            });
+    
+      
+            $.ajaxSetup({
+              beforeSend: function (request) {
+                request.setRequestHeader("X-CSRFToken", _csrf);
+              },
+            });
+      
+            $.ajax({
+              type: "POST",
+              url: "{{url_for('user.submit_answer',slug=lab.slug)}}",
+              contentType: "application/json;charset=UTF-8",
+              data: JSON.stringify(answers),
+              success: function () {
+                location.reload();
+              },
+            });
+      
+            answers = [];
+          });
     });
 </script>
 {% endblock scripts %}

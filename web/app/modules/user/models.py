@@ -135,7 +135,12 @@ class Lab(Base):
     def set_points(self):
         self.points = 0
         for question in self.questions:
-            self.points += question.points
+            self.points += question.question_point
+            
+            
+    def update(self, data):
+        for key, value in data.items():
+            setattr(self, key, value)
 
     @staticmethod
     def add_spaces(string, *args):
@@ -170,9 +175,10 @@ class SolvedLab(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=False)
+    challenge_id = Column(Integer, ForeignKey("challenges.id"))#nullable=False)
     solved_at = Column(DateTime, default=datetime.utcnow)
-
+    all_solved = Column(Boolean())
+    questions = relationship("Question", backref=backref("solved_lab"))
 
 class Challenge(Base):
     __tablename__ = "challenges"
@@ -228,17 +234,15 @@ class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True)
     lab_id = Column(Integer, ForeignKey("labs.id"))
-    line_number = Column(Integer())
-    description = Column(String(2555))
-    hint = Column(String(2555))
-    answer = Column(String(255), unique=True)
-    points = Column(Integer, default=0)
+    solved_lab_id = Column(Integer, ForeignKey("solved_labs.id"))
+    question_description = Column(String(2555))
+    question_hint = Column(String(2555))
+    question_value = Column(String(255))
+    question_point = Column(Integer, default=0)
 
-    def __init__(self, description=None, hint=None, answer=None, points=None):
-        self.description = description
-        self.hint = hint
-        self.answer = answer
-        self.points = points
+    def __init__(self, **kwargs):
+        for field in ["question_description", "question_hint", "question_value", "question_point"]:
+            setattr(self, field, kwargs.get(field))
 
 
 class News(Base):

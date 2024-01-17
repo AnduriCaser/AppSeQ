@@ -24,14 +24,14 @@ LABS = [
     {
         "name": "Union Based SQL Injection",
         "url": "http://localhost:3000",
-        "folder": "None",
+        "folder": f"{basedir}/Union_Based_SQL_Injection",
         "static": False,
     },
     {"name": "JWT 1", "url": "None", "folder": f"{basedir}/JWT 1", "static": True},
     {
         "name": "Cache Poisoning",
         "url": "None",
-        "folder": f"{basedir}/Union_Based_SQL_Injection",
+        "folder": f"{basedir}/Web Cache Poisoning",
         "static": True,
     },
 ]

@@ -11,6 +11,7 @@ from flask import (
     flash,
     send_from_directory,
     jsonify,
+    abort,
 )
 from flask_security import (
     auth_required,
@@ -37,6 +38,7 @@ def allowed_file():
 
 user = Blueprint("user", __name__, url_prefix="/")
 user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
+node_process = None
 
 
 @user.route("/dashboard")
@@ -49,12 +51,14 @@ def dashboard():
     courses_count = db_session.query(Course).count()
     labs_count = db_session.query(Lab).count()
     courses = db_session.query(Course).limit(per_page).offset(offset)
+    full_courses = db_session.query(Course).all()
     labs = db_session.query(Lab).limit(per_page).offset(offset)
 
     return render_template(
         "user/dashboard.html",
         courses=courses,
         labs=labs,
+        full_courses=full_courses
     )
 
 
@@ -124,35 +128,101 @@ def delete(id):
 @auth_required("session")
 def view_lab(slug):
     lab = db_session.query(Lab).filter(Lab.slug == slug).first()
-    return render_template("user/dynamic_lab_details.html", lab=lab)
+    solved_lab = next(
+        (
+            solved_lab
+            for solved_lab in current_user.solved_labs
+            if lab.id == solved_lab.id
+        ),
+        None,
+    )
+    return render_template(
+        "user/dynamic_lab_details.html", lab=lab, solved_lab=solved_lab
+    )
 
 
-@user.route("/labs/<string:slug>/start")
+@user.route("/labs/<string:slug>/start", methods=["GET"])
 @roles_accepted("user")
 @auth_required("session")
 def labs_start(slug):
+    global node_process
     lab = db_session.query(Lab).filter(Lab.slug == slug).one()
-    if lab and lab.static is not False:
-        pass
+    if lab and lab.static is False:
+        if node_process is None or node_process.poll() is not None:
+            node_process = subprocess.Popen(["nodemon", f"{lab.folder}/index.js"])
+            return "Application started"
+
+    return "Application already started"
 
 
-@user.route("/labs/<string:slug>/stop")
+@user.route("/labs/<string:slug>/stop", methods=["GET"])
 @roles_accepted("user")
 @auth_required("session")
 def labs_stop(slug):
-    pass
+    global node_process
+    lab = db_session.query(Lab).filter(Lab.slug == slug).one()
+    if lab and lab.static is False:
+        if node_process is not None and node_process.poll() is None:
+            node_process.terminate()
+            node_process = None
+            return "Applicaton stopped"
+
+    return "Something went wrong !"
+from sqlalchemy.orm.exc import NoResultFound
 
 
-@user.route("/labs/<string:slug>/answer/submit")
+@user.route("/labs/<string:slug>/answer/submit", methods=["POST"])
 @roles_accepted("user")
 @auth_required("session")
 def submit_answer(slug):
-    data = request.get_json()
-    lab = db_session.query(Lab).filter(Lab.slug == slug).one()
-    if lab and lab.static != True:
-        pass
-    else:
-        pass
+    if request.method == "POST":
+        data = request.get_json()
+
+        try:
+            lab = db_session.query(Lab).filter_by(slug=slug).one()
+        except NoResultFound:
+            abort(404, description="Lab not found")
+
+        solved_lab = next(
+            (
+                solved_lab
+                for solved_lab in current_user.solved_labs
+                if solved_lab.id == lab.id
+            ),
+            None,
+        )
+
+        if not solved_lab:
+            solved_lab = SolvedLab()
+            current_user.solved_labs.append(solved_lab)
+
+        for q in data:
+            question_id = int(q["id"])
+            question_value = q["question_value"]
+
+            question = next(
+                (
+                    question
+                    for question in lab.questions
+                    if question.id == question_id
+                    and question.question_value == question_value
+                ),
+                None,
+            )
+
+            if question:
+                if question not in solved_lab.questions:
+                    solved_lab.questions.append(question)
+
+        db_session.commit()
+
+        if all(
+            target_question in solved_lab.questions for target_question in lab.questions
+        ):
+            solved_lab.all_solved = True
+            db_session.commit()
+
+        return redirect(url_for("user.view_lab", slug=lab.slug))
 
 
 @user.route("/labs/<string:slug>/download", methods=["GET"])

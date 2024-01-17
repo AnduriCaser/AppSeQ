@@ -111,13 +111,13 @@
                 <div style="display: none;" class="row py-0 px-4 questions_animate_box">
                     <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
                         class="col-md p-0">
-                        <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.description}}</p>
+                        <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
                         <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
                             <input disabled
                                 style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
-                                class="form-control" type="text" value="{{question.answer}}">
+                                class="form-control" type="text" value="{{question.question_value}}">
                             <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
-                            <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.points}} points
+                            <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
                             </p>
                         </div>
                     </div>

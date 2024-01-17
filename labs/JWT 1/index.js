@@ -46,9 +46,9 @@ app.post("/jwt/none", (req, res) => {
       secret_key =
         "885ae2060fbedcfb491c5e8aafc92cab5a8057b3d4c39655acce9d4f09280a20";
 
-        res.status(200).json({
-          message : "This is the same JWT as before !"
-        })
+      res.status(200).json({
+        message: "This is the same JWT as before !",
+      });
     } else if (jwt_b64_dec.header.alg == "none") {
       secret_key = "";
       JWT.verify(
