@@ -123,62 +123,44 @@
         </div>
         {% if lab.questions|length > 0 %}
 
-            {% for question in lab.questions  %}
-                {% if solved_lab.questions|length >0 %}
-                    {% for q_solved in solved_lab.questions  %}
-                        {% if q_solved.id == question.id %}
-                            <div style="display: none;" class="row py-0 px-4 questions_animate_box">
-                                <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
-                                    class="col-md p-0">
-                                    <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
-                                    <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
-                                        <input disabled type="hidden" type="text" value="{{question.id}}">
-                                        <input disabled
-                                            style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
-                                            class="form-control" type="text" value="{{question.question_value}}">
-                                        <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
-                                        <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+        {% set counter = 0 %}
+        {% for question in lab.questions %}
+            {% set counter = counter + 1 %}
+            <div style="display: none;" class="row py-0 px-4 questions_animate_box">
+                <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
+                    class="col-md p-0">
+                    <p class="card-text text-white p-8 pb-0">{{ counter }}. {{ question.question_description }}</p>
+                    <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
+                        <input type="hidden" name="question_id[]" value="{{ question.id }}">
+                        {% if solved_lab.questions|length > 0 %}
+                            {% set question_solved = false %}
+                            {% for q_solved in solved_lab.questions %}
+                                {% if q_solved.id == question.id %}
+                                    {% set question_solved = true %}
+                                    <input disabled
+                                        style="background-color: #202020;border-radius: 5px;border-color: #e45735!important;color: white;"
+                                        class="form-control" type="text" name="answer[]" value="{{ q_solved.question_value }}">
+                                {% endif %}
+                                {% if not question_solved %}
+                                    <input style="background-color: #202020;border-radius: 5px;color: white;"
+                                        class="form-control" type="text" name="answer[]" value="">
+                                {% endif %}
+                            {% endfor %}
+                           
                         {% else %}
-                            <div style="display: none;" class="row py-0 px-4 questions_animate_box">
-                                <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
-                                    class="col-md p-0">
-                                    <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
-                                    <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
-                                        <input type="hidden" type="text" value="{{question.id}}">
-                                        <input
-                                            style="background-color: #202020;border-radius: 5px;color: white;"
-                                            class="form-control" type="text" value="">
-                                        <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
-                                        <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
+                            <input style="background-color: #202020;border-radius: 5px;color: white;"
+                                class="form-control" type="text" name="answer[]" value="">
                         {% endif %}
-                    {% endfor %}
-                {% else %}
-                    <div style="display: none;" class="row py-0 px-4 questions_animate_box">
-                        <div style="height: 140px;background-color: rgb(20, 20, 20);border-radius: 7px;font-family: Source Sans Pro,sans-serif!important;"
-                            class="col-md p-0">
-                            <p class="card-text text-white p-8 pb-0">{{++loop.index}}. {{question.question_description}}</p>
-                            <div style="width: 54%;" class="float-start d-flex justify-content-center align-items-center px-8">
-                                <input type="hidden" type="text" value="{{question.id}}">
-                                <input
-                                    style="background-color: #202020;border-radius: 5px;color: white;"
-                                    class="form-control" type="text" value="">
-                                <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
-                                <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{question.question_point}} points
-                                </p>
-                            </div>
-                        </div>
+                        <i style="font-size: 16px;color: rgb(185,185,185);" class="fa-solid fa-bullseye mx-2"></i>
+                        <p style="font-size: 12px;color: rgb(185,185,185);white-space:nowrap;" class="card-text mx-2">{{ question.question_point }} points
+                        </p>
+                    </div>
                 </div>
-                {% endif %}
-               
-            {% endfor %}
+            </div>
+        {% endfor %}
+        
+        
+        
             <div class="row mt-2 p-2">
                 <div class="col-md">
                     <div class="float-end">

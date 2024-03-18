@@ -24,6 +24,9 @@ from flask_security import (
 )
 
 from flask_paginate import Pagination, get_page_parameter
+from sqlalchemy.orm.exc import NoResultFound
+
+
 from app.modules.admin import hash_password
 from app.modules.user.models import *
 from app.db import db_session
@@ -166,10 +169,8 @@ def labs_stop(slug):
             node_process.terminate()
             node_process = None
             return "Applicaton stopped"
-
+    
     return "Something went wrong !"
-from sqlalchemy.orm.exc import NoResultFound
-
 
 @user.route("/labs/<string:slug>/answer/submit", methods=["POST"])
 @roles_accepted("user")

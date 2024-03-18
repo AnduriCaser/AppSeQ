@@ -12,7 +12,6 @@ user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 basedir = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../../../../labs"))
 
 
-print(basedir)
 
 ADMIN = {
     "username": "admin",

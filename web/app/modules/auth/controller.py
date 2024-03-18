@@ -27,7 +27,7 @@ mail = Mail(current_app)
 
 
 def email_sender(email, html):
-    msg = Message("CyberPath Reset Password", recipients=[email], html=html)
+    msg = Message("AppSeQ Reset Password", recipients=[email], html=html)
     try:
         mail.send(msg)
     except Exception as e:
@@ -143,7 +143,7 @@ def forgot_password():
             )
 
             try:
-                email_sender("carlosthier89@gmail.com", html)
+                email_sender(user.email, html)
                 flash("Reset request sent. Check your email.", "success")
                 return render_template("auth/password-reset.html")
             except Exception:

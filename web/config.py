@@ -10,7 +10,7 @@ MAIL_DEFAULT_SENDER = "carlosthier89@gmail.com"
 
 MAIL_USERNAME = "carlosthier89@gmail.com"
 
-MAIL_PASSWORD = "jywjkhbxepvfmzfj"
+MAIL_PASSWORD = "pavp sfmq xhom kfvv "
 
 MAIL_USE_TLS = False
 

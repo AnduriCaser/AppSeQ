@@ -107,7 +107,7 @@ class Course(Base):
         self.description = description
 
     def get_challenges(self, course):
-        return [challenge.as_dict() for challenge in course.challenges]
+        return [challenge.as_dict()["name"] for challenge in course.challenges]
 
 
 class Lab(Base):
