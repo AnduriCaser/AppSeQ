@@ -24,6 +24,18 @@
     </span>
     <span class="menu-title">Profile</span>
   </a>
+  <a class="menu-link" href="{{url_for('admin.view_ai_lab')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">Create Lab</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.wiew_multiple_lab_challenge_create_room')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-ranking-star"></i>
+    </span>
+    <span class="menu-title">Create Lab Room</span>
+  </a>
   <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
     <span class="menu-icon">
       <i class="fa-solid fa-user"></i>
@@ -74,7 +86,38 @@
     {% endfor %}
 </div>
 {% endfor %}
-{% endblock sidebar %} {% block content %}
+{% endblock sidebar %} 
+
+{% block multiple_sidebar %}
+{% for lab_room in current_user.lab_rooms %}
+<div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+    <span class="menu-link">
+        <span class="menu-icon">
+            <i class="bi bi-archive fs-3"></i>
+        </span>
+        <span class="menu-title">{{lab_room.name}}</span>
+        <span class="menu-arrow"></span>
+    </span>
+    {% for challenge in course.challenges %}
+    <div class="menu-sub menu-sub-accordion menu-active-bg">
+        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
+            <span class="menu-link">
+                <span class="menu-bullet">
+                    <span class="bullet bullet-dot"></span>
+                </span>
+                <span class="menu-title">{{challenge.name}}</span>
+                <span class="menu-arrow"></span>
+            </span>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endfor %}
+
+{% endblock multiple_sidebar%}
+
+
+{% block content %}
 <div class="container">
   <div class="row mt-2 p-2">
     <div class="col-md p-0">

@@ -19,3 +19,6 @@ Base.query = db_session.query_property()
 
 async def init_db():
     Base.metadata.create_all(bind=engine)
+
+
+#root:Tr1234567@127.0.0.1:3306

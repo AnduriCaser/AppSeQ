@@ -8,6 +8,12 @@ import uuid
 
 from app.db import Base
 
+users_lab_rooms = Table(
+    "users_lab_rooms",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id")),
+    Column("lab_room_id", Integer, ForeignKey("lab_rooms.id")),
+)
 
 users_roles = Table(
     "users_roles",
@@ -35,6 +41,14 @@ users_labs = Table(
     Base.metadata,
     Column("user_id", Integer, ForeignKey("users.id")),
     Column("lab_id", Integer, ForeignKey("labs.id")),
+)
+
+
+users_solved_labs = Table(
+    "users_solved_labs",
+    Base.metadata,
+    Column("user_id", Integer, ForeignKey("users.id")),
+    Column("solved_lab_id", Integer, ForeignKey("solved_labs.id")),
 )
 
 challenges_labs = Table(
@@ -80,7 +94,15 @@ class User(Base, UserMixin):
     roles = relationship("Role", secondary=users_roles, backref=backref("users"))
     comments = relationship("Comment", backref=backref("user"))
     solved_challenges = relationship("SolvedChallenge", backref=backref("user"))
-    solved_labs = relationship("SolvedLab", backref=backref("user"))
+    solved_labs = relationship(
+        "SolvedLab", secondary=users_solved_labs, backref=backref("users")
+    )
+    lab_rooms = relationship(
+        "LabRoom", secondary=users_lab_rooms, backref=backref("users")
+    )
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Role(Base, RoleMixin):
@@ -122,12 +144,14 @@ class Lab(Base):
     slug = Column(String(255), default=lambda: uuid.uuid4().hex, unique=True)
     static = Column(Boolean())
     folder = Column(String(2555))
+    code = Column(String(2555))
     mission_statement = Column(String(3000))
     url = Column(String(255))
     description = Column(String(2000))
     questions = relationship("Question", backref=backref("lab"))
     created_at = Column(DateTime, default=datetime.utcnow)
     comments = relationship("Comment", backref=backref("lab"))
+    lab_rooms = relationship("LabRoom", backref=backref("lab"))
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -136,8 +160,7 @@ class Lab(Base):
         self.points = 0
         for question in self.questions:
             self.points += question.question_point
-            
-            
+
     def update(self, data):
         for key, value in data.items():
             setattr(self, key, value)
@@ -149,6 +172,38 @@ class Lab(Base):
             n_array.append(string[:i])
             string = string[i:]
         return " ".join(n_array)
+
+
+class LabRoom(Base):
+    __tablename__ = "lab_rooms"
+    id = Column(Integer, primary_key=True)
+    lab_id = Column(Integer, ForeignKey("labs.id"), nullable=False)
+    winner_id = Column(Integer, ForeignKey("users.id"))
+    name = Column(String(255))
+    description = Column(String(255))
+    room_slug = Column(String(255), default=lambda: uuid.uuid4().hex, unique=True)
+    slug = Column(String(255), default=lambda: uuid.uuid4().hex, unique=True)
+    time = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    finished_at = Column(DateTime, default=datetime.utcnow)
+    winner = relationship("User", uselist=False, backref=backref("lab_room"))
+
+    def __init__(self, name=None, description=None):
+        self.name = name
+        self.description = description
+
+
+class Message(Base):  # Base
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    message = Column(String(2555), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+
+    def __init__(self, user_id=None, message=None):
+        self.message = message
 
 
 # class Category(Base):
@@ -174,11 +229,15 @@ class SolvedLab(Base):
     __tablename__ = "solved_labs"
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    challenge_id = Column(Integer, ForeignKey("challenges.id"))#nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    challenge_id = Column(Integer, ForeignKey("challenges.id"))
     solved_at = Column(DateTime, default=datetime.utcnow)
     all_solved = Column(Boolean())
     questions = relationship("Question", backref=backref("solved_lab"))
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Challenge(Base):
     __tablename__ = "challenges"
@@ -188,7 +247,7 @@ class Challenge(Base):
     description = Column(String(2555), nullable=False)
     difficulty = Column(String(20))
     points = Column(Integer, default=0)
-    #category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
+    # category_id = Column(Integer, ForeignKey("categories.id"), nullable=False)
     release_date = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     labs = relationship("Lab", secondary=challenges_labs, backref=backref("challenges"))
@@ -233,16 +292,35 @@ class Comment(Base):
 class Question(Base):
     __tablename__ = "questions"
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
     lab_id = Column(Integer, ForeignKey("labs.id"))
     solved_lab_id = Column(Integer, ForeignKey("solved_labs.id"))
     question_description = Column(String(2555))
     question_hint = Column(String(2555))
     question_value = Column(String(255))
     question_point = Column(Integer, default=0)
+    solved_by = relationship("User", backref=backref("solved_questions"))
 
     def __init__(self, **kwargs):
-        for field in ["question_description", "question_hint", "question_value", "question_point"]:
+        for field in [
+            "question_description",
+            "question_hint",
+            "question_value",
+            "question_point",
+        ]:
             setattr(self, field, kwargs.get(field))
+            
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+# Add the missing import statement
+
+
+# class AutoComplete(Base):
+#     __tablename__ = "autocompletes"
+
+#     id = Column(Integer, primary_key=True)
 
 
 class News(Base):

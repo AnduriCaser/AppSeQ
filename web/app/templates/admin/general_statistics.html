@@ -14,30 +14,42 @@
 {% block nav_tag %}
 <div class="menu-item">
     <a class="menu-link" href="{{url_for('admin.dashboard')}}">
-        <span class="menu-icon">
-            <i class="bi bi-house fs-3 text-white"></i>
-        </span>
-        <span class="menu-title text-white">Dashboard</span>
+      <span class="menu-icon">
+        <i class="bi bi-house fs-3 text-white"></i>
+      </span>
+      <span class="menu-title text-white">Dashboard</span>
     </a>
     <a class="menu-link" href="{{url_for('admin.profile')}}">
-        <span class="menu-icon">
-            <i class="fa-solid fa-user"></i>
-        </span>
-        <span class="menu-title">Profile</span>
+      <span class="menu-icon">
+        <i class="fa-solid fa-user"></i>
+      </span>
+      <span class="menu-title">Profile</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.view_ai_lab')}}">
+      <span class="menu-icon">
+        <i class="fa-solid fa-user"></i>
+      </span>
+      <span class="menu-title">Create Lab</span>
+    </a>
+    <a class="menu-link" href="{{url_for('admin.wiew_multiple_lab_challenge_create_room')}}">
+      <span class="menu-icon">
+        <i class="fa-solid fa-ranking-star"></i>
+      </span>
+      <span class="menu-title">Create Lab Room</span>
     </a>
     <a class="menu-link active" href="{{url_for('admin.general_statistics')}}">
-        <span class="menu-icon">
-            <i class="fa-solid fa-user"></i>
-        </span>
-        <span class="menu-title">General Statistics</span>
+      <span class="menu-icon">
+        <i class="fa-solid fa-user"></i>
+      </span>
+      <span class="menu-title">General Statistics</span>
     </a>
     <a class="menu-link" href="{{url_for('auth.logout')}}">
-        <span class="menu-icon">
-            <i class="fa-solid fa-ranking-star"></i>
-        </span>
-        <span class="menu-title">Logout</span>
+      <span class="menu-icon">
+        <i class="fa-solid fa-ranking-star"></i>
+      </span>
+      <span class="menu-title">Logout</span>
     </a>
-</div>
+  </div>
 {% endblock nav_tag %}
 
 {% block content %}

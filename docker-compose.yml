@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  db:
+    container_name: db
+    image: mysql:8.0
+    restart: always
+    ports:
+      - 3906:3306
+    environment:
+      - "MYSQL_ROOT_PASSWORD=Tr1234567"
+      - "MYSQL_USER=test"
+      - "MYSQL_PASSWORD=Tr1234567"
+      - "MYSQL_DATABASE=appseq"
+    volumes:
+      - /var/lib/mysql
+
+  app:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    ports:
+      - 3200:3200
+    environment:
+      - DB_HOST=db
+    depends_on:
+      - db

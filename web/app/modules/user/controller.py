@@ -25,7 +25,8 @@ from flask_security import (
 
 from flask_paginate import Pagination, get_page_parameter
 from sqlalchemy.orm.exc import NoResultFound
-
+from flask_socketio import SocketIO, join_room, leave_room, send, emit
+import redis
 
 from app.modules.admin import hash_password
 from app.modules.user.models import *
@@ -44,6 +45,14 @@ user_datastore = SQLAlchemySessionUserDatastore(db_session, User, Role)
 node_process = None
 
 
+socketio = SocketIO(current_app)
+
+
+redis_client = redis.StrictRedis(
+    host="localhost", port=6379, db=0, decode_responses=True
+)
+
+
 @user.route("/dashboard")
 @roles_accepted("user")
 @auth_required("session")
@@ -58,10 +67,7 @@ def dashboard():
     labs = db_session.query(Lab).limit(per_page).offset(offset)
 
     return render_template(
-        "user/dashboard.html",
-        courses=courses,
-        labs=labs,
-        full_courses=full_courses
+        "user/dashboard.html", courses=courses, labs=labs, full_courses=full_courses
     )
 
 
@@ -169,8 +175,9 @@ def labs_stop(slug):
             node_process.terminate()
             node_process = None
             return "Applicaton stopped"
-    
+
     return "Something went wrong !"
+
 
 @user.route("/labs/<string:slug>/answer/submit", methods=["POST"])
 @roles_accepted("user")
@@ -265,3 +272,122 @@ def news():
 @auth_required("session")
 def create_news():
     pass
+
+
+# Challenge başladığı zaman kullanıcılara bu endpoint urli ver çözmeye başlasın !
+@user.route("/multiple/labs/<string:lab_slug>/room/<string:room_slug>/challenge")
+@roles_required("user")
+@auth_required("session")
+def multiple_lab_challenge_screen(lab_slug, room_slug):
+    lab = db_session.query(Lab).filter(Lab.slug == lab_slug).first()
+    room = db_session.query(LabRoom).filter(LabRoom.room_slug == room_slug).first()
+
+    if room not in lab.lab_rooms:
+        abort(404, description="Lab isn't attend to this room")
+
+    solved_lab = next(
+        (
+            solved_lab
+            for solved_lab in current_user.solved_labs
+            if lab.id == solved_lab.id
+        ),
+        None,
+    )
+    return render_template(
+        "common/multiple_lab_challenge.html", lab=lab, solved_lab=solved_lab, room=room
+    )
+
+
+# İki kullanıcının soruları soruların cevabını submit edeceği kısım. Doğru cevaplayanın inputu borderı yeşil
+# yanlış cevaplayanın ya da geç kalanın input disabled olacak.
+
+
+@user.route(
+    "/multiple/labs/<string:lab_slug>/room/<string:room_slug>/answer/submit",
+    methods=["POST"],
+)
+@roles_accepted("user")
+@auth_required("session")
+def multiple_lab_challenge_submit_answer(lab_slug, room_slug):
+    if request.method == "POST":
+        data = request.get_json()
+
+        try:
+            lab = db_session.query(Lab).filter_by(slug=lab_slug).first()
+            room = db_session.query(LabRoom).filter_by(room_slug=room_slug).first()
+            users = room.users
+
+        except NoResultFound:
+            abort(404, description="Lab or room not found")
+
+        if room not in lab.lab_rooms:
+            abort(404, description="Lab isn't attend to this room")
+
+        # algoritmayı sonra düzelt
+        solved_lab = next(
+            (
+                solved_lab
+                for user in users
+                for solved_lab in user.solved_labs
+                if solved_lab.id == lab.id
+            ),
+            None,
+        )
+
+        if not solved_lab:
+            solved_lab = SolvedLab()
+            for user in users:
+                user.solved_labs.append(solved_lab)
+
+        for q in data:
+            question_id = int(q["id"])
+            question_value = q["question_value"]
+
+            question = next(
+                (
+                    question
+                    for question in lab.questions
+                    if question.id == question_id
+                    and question.question_value == question_value
+                ),
+            )
+
+            if question:
+                question_key = f"question_{question.id}_solved"
+
+                if not redis_client.exists(question_key):
+                    redis_client.set(question_key, current_user.id)
+                    if question not in solved_lab.questions:
+                        question.solved_by = current_user
+                        solved_lab.questions.append(question)
+
+            db_session.commit()
+
+            emit(
+                "trace_answers",
+                {"question_id": question_id, "solved_by": question.solved_by.username},
+                broadcast=True,
+                namespace="/",
+            )
+
+        if all(
+            target_question in solved_lab.questions for target_question in lab.questions
+        ):
+            solved_lab.all_solved = True
+            room.winner = current_user
+            db_session.commit()
+
+            emit(
+                "end_challenge",
+                {"message": "Challenge is done", "winner": "Deneme"},
+                broadcast=True,
+                namespace="/",
+            )
+
+        return redirect(
+            url_for(
+                "user.multiple_lab_challenge_screen",
+                lab_slug=lab.slug,
+                room_slug=room.room_slug,
+            )
+        )

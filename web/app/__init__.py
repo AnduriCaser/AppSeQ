@@ -1,13 +1,19 @@
 from flask import Flask
 from celery import Celery
+from flask_security import Security, SQLAlchemySessionUserDatastore
+from flask_mail import Mail
+from flask_wtf.csrf import CSRFProtect
+from flask_socketio import SocketIO
+from flask_cors import CORS
+import asyncio
+
+
+
 from app.modules.user.models import User, Role
 from app.modules.auth import create_roles
 from app.modules.admin import create_admin, set_admin_role, create_labs
 from app.db import init_db, db_session
-from flask_security import Security, SQLAlchemySessionUserDatastore
-from flask_mail import Mail
-from flask_wtf.csrf import CSRFProtect
-import asyncio
+from app.modules.common.events import socketio
 
 
 async def async_before_request():
@@ -27,10 +33,14 @@ def create_app():
         from app.modules.auth.controller import auth
         from app.modules.user.controller import user
         from app.modules.admin.controller import admin
+        from app.modules.common.controller import common
 
         app.register_blueprint(auth)
         app.register_blueprint(user)
         app.register_blueprint(admin)
+        app.register_blueprint(common)
+        
+        socketio.init_app(app)
 
     return app
 

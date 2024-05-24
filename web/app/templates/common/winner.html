@@ -1,0 +1,163 @@
+{% extends "layout.html" %} {% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  .confetti {
+    left: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    height: 100%;
+    width: 100%;
+  }
+
+  .confetti-item {
+    position: absolute;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+  }
+  @keyframes confetti-fall {
+    0% {
+      transform: translateY(-100%);
+    }
+    95% {
+      animation-timing-function: ease-in-out;
+      transform: translateY(calc(100vh - 55%));
+    }
+    100% {
+      transform: translateY(calc(150vh - 65%));
+    }
+  }
+</style>
+{% endblock header %} {% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">
+  Labs
+  <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %} {% block nav_tag %}
+<div class="menu-item">
+  <a class="menu-link active" href="{{url_for('admin.dashboard')}}">
+    <span class="menu-icon">
+      <i class="bi bi-house fs-3 text-white"></i>
+    </span>
+    <span class="menu-title text-white">Dashboard</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.profile')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">Profile</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">General Statistics</span>
+  </a>
+  <a class="menu-link" href="{{url_for('auth.logout')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-ranking-star"></i>
+    </span>
+    <span class="menu-title">Logout</span>
+  </a>
+</div>
+{% endblock nav_tag %} {% block content %}
+
+{% if room.winner == current_user %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 text-center mt-5">
+      <i style="color: gold;" class="bi bi-trophy fa-10x"></i>
+      <h1 class="card-title text-white mt-4">Congratulations!</h1>
+      <p class="card-text text-white mt-4 ">You are the winner!</p>
+      <p class="card-text text-white mt-4 ">{{current_user.username}}!</p>
+      <svg class="dn">
+        <defs>
+          <symbol id="svg-confetti">
+            <path
+              fill="currentColor"
+              d="M-.017 6.91L4.035.012l2.587 1.52L2.57 8.43z"
+            ></path>
+          </symbol>
+        </defs>
+      </svg>s
+    </div>
+  </div>
+</div>
+
+{% else %}
+<div class="container">
+  <div class="row">
+    <div class="col-12 text-center mt-5">
+      <h1 class="card-title text-white mt-4">:(</h1>
+      <h1 class="card-title text-white mt-4">Sorry You Lost!</h1>
+      <p class="card-text text-white mt-4 ">{{current_user.username}}</p>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock content %} {% block scripts %}
+<script>
+  {% if room.winner == current_user %}
+  $(document).ready(function () {
+    confetti();
+  });
+
+  function randomize(collection) {
+    var randomNumber = Math.floor(Math.random() * collection.length);
+    return collection[randomNumber];
+  }
+
+  function confetti() {
+    $(".confetti").remove();
+    var $confettiItems = $('<div class="confetti"></div>'),
+      colors = ["#3b5692", "#f9c70b", "#00abed", "#ea6747"],
+      height = 6.6,
+      width = 6.6;
+
+    var scale, $confettiItem;
+
+    for (var i = 0; i < 200; i++) {
+      scale = Math.random() * 1.75 + 1;
+      $confettiItem = $(
+        "<svg class='confetti-item' width='" +
+          width * scale +
+          "' height='" +
+          height * scale +
+          "' viewbox='0 0 " +
+          width +
+          " " +
+          height +
+          "'>\n  <use transform='rotate(" +
+          Math.random() * 360 +
+          ", " +
+          width / 2 +
+          ", " +
+          height / 2 +
+          ")' xlink:href='#svg-confetti' />\n</svg>"
+      );
+      $confettiItem.css({
+        animation:
+          Math.random() +
+          2 +
+          "s " +
+          Math.random() * 2 +
+          "s confetti-fall ease-in both",
+        color: randomize(colors),
+        left: Math.random() * 100 + "vw",
+      });
+      $confettiItems.append($confettiItem);
+    }
+    $("body").append($confettiItems);
+  }
+  {% endif %}
+</script>
+
+{% endblock scripts %}

@@ -1,7 +1,16 @@
 # TODO
 
+- 1) Statik labları oto generate et question ve answerlarını oluştur
 
-- 1) Admin fonksiyonlarını test et ve labları oluştur.
-- 3) Normal kullanıcı labı başlatma durdurma olaylarını hallet. (Redis queue ile daha sonra ilave edilecek)
+- 2) Statik lab ekranını düzelt kod bloğu gelecek. Dinamik lab aynı şekilde kalsın.
 
-- 4) Statik labların ismini değiştir. Node JS Snippet koy örneğin
+- 3) Eğer lab kabul edilirse bunu upload et ve düzelt. Örneğin php file geldi bunu prettier hale getir.
+
+- 4) Admin için statik lab generate ekranı oluştur. Sorular Line number ve zafiyet ismi olacak.
+
+- 5) Bir de aiden dönen response u parse et ve onu admine göster
+
+
+
+
+Vakit kalırsa soruların cevapları için bir autocomplete yap 5 tane değer olsun her input için ai api ile olur

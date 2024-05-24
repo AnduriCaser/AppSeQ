@@ -1,0 +1,449 @@
+{% extends "layout.html" %} {% block header %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro&display=swap"
+  rel="stylesheet"
+/>
+<link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" /> 
+{% endblock header %} {% block header_tag %}
+<h1 class="d-flex align-items-center text-white fw-bolder my-1 fs-3">
+  Create Lab
+  <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
+</h1>
+{% endblock header_tag %} {% block nav_tag %}
+<div class="menu-item">
+  <a class="menu-link" href="{{url_for('admin.dashboard')}}">
+    <span class="menu-icon">
+      <i class="bi bi-house fs-3 text-white"></i>
+    </span>
+    <span class="menu-title text-white">Dashboard</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.profile')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">Profile</span>
+  </a>
+  <a class="menu-link active" href="{{url_for('admin.view_ai_lab')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">Create Lab</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.wiew_multiple_lab_challenge_create_room')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-ranking-star"></i>
+    </span>
+    <span class="menu-title">Create Lab Room</span>
+  </a>
+  <a class="menu-link" href="{{url_for('admin.general_statistics')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-user"></i>
+    </span>
+    <span class="menu-title">General Statistics</span>
+  </a>
+  <a class="menu-link" href="{{url_for('auth.logout')}}">
+    <span class="menu-icon">
+      <i class="fa-solid fa-ranking-star"></i>
+    </span>
+    <span class="menu-title">Logout</span>
+  </a>
+</div>
+{% endblock nav_tag %} {% block content %}
+<div class="container">
+  <form id="course" class="form-floating">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    <div class="row mt-2 p-2">
+      <div class="col-md">
+        <div
+          class="d-flex flex-column justify-content-center align-items-center"
+        >
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div
+            style="background-color: #202020; border-radius: 5px; width: 100%"
+            class="d-flex justify-content-center align-items-center error mb-3"
+          >
+            <i
+              style="color: #bd3f2e"
+              class="fa-solid fa-circle-exclamation py-3 mx-2"
+            ></i>
+            <p style="color: #bd3f2e" class="card-text py-3 mx-2">
+              {{message}}
+            </p>
+          </div>
+          {% endfor %} {% endif %} {% endwith %}
+        </div>
+      </div>
+    </div>
+    <!-- Labları remove etme olayını en son yap-->
+    <div id="removeLabScreen"></div>
+    <div
+      id="labScreen"
+      style="background-color: rgba(10, 10, 10, 0.86)"
+      class="modal fade"
+    >
+      <div class="modal-dialog modal-fullscreen modal-dialog-centered">
+        <div
+          style="background-color: #242424; border-radius: 5px"
+          class="modal-content border-0 text-white"
+        >
+          <div class="modal-header border-0">
+            <h5 class="modal-title">ADD LABS</h5>
+          </div>
+          <div
+            style="
+              background-color: #1d1d1d;
+              font-family: Source Sans Pro, sans-serif !important;
+            "
+            class="modal-body d-flex justify-content-center"
+          >
+            <div style="width: 70%" class="fv-row mt-12 p-2 px-15">
+              <h3 class="card-title mb-5 fs-2">Lab List</h3>
+              <div
+                style="background-color: #252525; border-radius: 5px"
+                class="col-md p-0"
+              >
+                <div
+                  style="background-color: #252525; border-radius: 5px"
+                  class="card"
+                >
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table align-middle g-5">
+                        <thead>
+                          <tr id="heading_one" class="border-0">
+                            <th class="text-white fw-bolder">
+                              <label
+                                class="form-check form-check-inline form-check solid"
+                              >
+                                <input
+                                  id="check_all"
+                                  style="
+                                    background-color: #444;
+                                    border-radius: 3px;
+                                    cursor: pointer;
+                                  "
+                                  class="form-check-input border-0"
+                                  type="checkbox"
+                                />
+                              </label>
+                            </th>
+                            <th class="text-white fw-bolder">LAB NAME</th>
+                            <th class="text-white fw-bolder">DESCRIPTION</th>
+                            <th class="text-white fw-bolder text-center">
+                              POINTS
+                            </th>
+                            <th class="text-white fw-bolder text-center">
+                              DIFFICULTY
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody
+                          id="paginate"
+                          style="
+                            font-family: 'Source Sans Pro', sans-serif !important;
+                          "
+                        ></tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <ul
+                id="pagination-labs"
+                class="pagination-sm d-flex justify-content-center mt-4"
+              ></ul>
+            </div>
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              id="close"
+              style="background-color: #303030; border-radius: 5px"
+              type="button"
+              class="btn btn-sm text-white"
+            >
+              Close
+            </button>
+            <button
+              id="setLabs"
+              style="background-color: #943124; border-radius: 5px"
+              type="button"
+              class="btn btn-sm text-white"
+            >
+              Add labs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      id="deleteScreen"
+      style="background-color: rgba(10, 10, 10, 0.86)"
+      class="modal fade"
+    >
+      <div
+        style="width: 65% !important"
+        class="modal-dialog modal-dialog-centered"
+      >
+        <div
+          style="background-color: #242424; border-radius: 5px"
+          class="modal-content border-0 text-white"
+        >
+          <div class="modal-header border-0">
+            <h5 class="modal-title">REMOVING MODULE</h5>
+          </div>
+          <div
+            style="background-color: #1d1d1d"
+            class="modal-body d-flex justify-content-center align-items-center"
+          >
+            <i
+              style="color: #e45735"
+              class="fa-solid fa-circle-exclamation fa-2x mx-auto"
+            ></i>
+            <p id="moduleContent" class="card-text mx-auto"></p>
+          </div>
+          <div class="modal-footer border-0">
+            <button
+              id="cancel"
+              style="background-color: #303030; border-radius: 5px"
+              type="button"
+              class="btn btn-sm text-white"
+            >
+              Cancel
+            </button>
+            <button
+              id="delete"
+              style="background-color: #e45735; border-radius: 5px"
+              type="button"
+              class="btn btn-sm text-white"
+            >
+              Remove Module
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-2 p-2">
+      <div class="col-md">
+        <div
+          class="d-flex flex-column justify-content-start align-items-start float-start"
+        >
+          <h5
+            style="
+              color: rgb(185, 185, 185);
+              font-family: 'Source Sans Pro', sans-serif !important;
+            "
+            class="card-title"
+          >
+            CODE LANGUAGES
+          </h5>
+        </div>
+       
+    </div>
+    <div class="row mt-2 p-5">
+        <div style="background-color: #222; border-radius: 7px" class="col-md p-0">
+          <div style="background-color: #222; border-radius: 7px" class="card">
+            <div class="card-body">
+                <div class="row m-4 p-4">
+                    <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-php-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">PHP</p>
+                        </span>
+                    </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-python-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Python</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-cplusplus-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">C++</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-dotnetcore-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">.Net Core</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-express-original fa-5x"></i>
+                            <p class="card-text text-white text-center">Express</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-java-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Java</p>
+                        </span>
+                      </div>
+                </div>
+
+                <div class="row m-4 p-4">
+                    <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-nodejs-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Node Js</p>
+                        </span>
+                    </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-ruby-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Ruby</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-laravel-original colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Laravel</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-codeigniter-plain colored fa-5x"></i>
+                            <p class="card-text text-white text-center">Code Igniter</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-flask-original fa-5x"></i>
+                            <p class="card-text text-white text-center">Flask</p>
+                        </span>
+                      </div>
+                      <div class="col-md d-flex justify-content-center">
+                        <span>
+                            <i class="devicon-django-plain fa-5x"></i>
+                            <p class="card-text text-white text-center">Django</p>
+                        </span>
+                      </div>
+                </div>
+              
+            </div>
+          </div>
+        </div>
+    </div>
+    <div style="position: relative;" class="fv-row mt-2 p-2">
+        <div class="btn-group">
+            <button style="background-color: #202020;border-radius: 5px;font-size:12px;" type="button"
+                class="btn dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
+                Vulnerability : <span style="font-size:12px;" id="vulnerability">sql injection</span>
+            </button>
+            <ul style="background-color: #202020;border-radius: 5px;" class="dropdown-menu vulnerability">
+                <li><a class="dropdown-item text-white" href="#">sql injection</a></li>
+                <li><a class="dropdown-item text-white" href="#">xss</a></li>
+                <li><a class="dropdown-item text-white" href="#">idor</a></li>
+                <li><a class="dropdown-item text-white" href="#">deserialization</a></li>
+                <li><a class="dropdown-item text-white" href="#">rce</a></li>
+                <li><a class="dropdown-item text-white" href="#">prototype pollution</a></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <button style="background-color: #202020;border-radius: 5px;font-size:12px;" type="button"
+                class="btn dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
+                Difficulty : <span style="font-size:12px;" id="difficulty">kolay</span>
+            </button>
+            <ul style="background-color: #202020;border-radius: 5px;" class="dropdown-menu difficulty">
+                <li><a class="dropdown-item text-white" href="#">kolay</a></li>
+                <li><a class="dropdown-item text-white" href="#">orta</a></li>
+                <li><a class="dropdown-item text-white" href="#">zor</a></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <button style="background-color: #202020;border-radius: 5px;font-size:12px;" type="button"
+                class="btn dropdown-toggle text-white" data-bs-toggle="dropdown" aria-expanded="false">
+                Question Number : <span style="font-size:12px;" id="questionNumber">0</span>
+            </button>
+            <ul style="background-color: #202020;border-radius: 5px;" class="dropdown-menu questionNumber">
+                <li><a class="dropdown-item text-white" href="#">1</a></li>
+                <li><a class="dropdown-item text-white" href="#">2</a></li>
+                <li><a class="dropdown-item text-white" href="#">3</a></li>
+                <li><a class="dropdown-item text-white" href="#">4</a></li>
+                <li><a class="dropdown-item text-white" href="#">5</a></li>
+            </ul>
+        </div>
+    </div>
+    <div style="position: relative;" class="fv-row mt-2 p-2">
+       
+    </div>
+    <div id="createButton" class="fv-row mt-2 p-2">
+      <div class="col-md float-start">
+        <button
+          id="send"
+          type="button"
+          style="background-color: #943124; border-radius: 5px"
+          class="btn btn-sm text-white"
+        >
+          Create
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock content %} {% block scripts %}
+<script>
+  $(document).ready(function () {
+    _csrf = "{{csrf_token()}}";
+    lab = {
+        difficulty : "kolay",
+        language : "",
+        vulnerability: "sql injection",
+        question_number : 0
+    }
+
+
+    $(".difficulty > li").click(function () {
+        difficulty = $(this).children("a").text()
+        $("#difficulty").text(difficulty);
+        lab.difficulty = difficulty;
+    });
+
+    $(".vulnerability > li").click(function () {
+        vulnerability = $(this).children("a").text()
+        $("#vulnerability").text(vulnerability);
+        lab.vulnerability = vulnerability;
+    });
+
+
+    $(".questionNumber > li").click(function () {
+        questionNumber = $(this).children("a").text()
+        $("#questionNumber").text(questionNumber);
+        lab.question_number = Number.parseInt(questionNumber);
+    });
+
+    $(".col-md>span").click(function() {
+        $("span").css('border','');
+        $(this).css("border", "#943124 solid 2px");
+        lab.language = $(this).children("p").text()
+    });
+
+
+    $("#send").click(function(){
+        $.ajaxSetup({
+            beforeSend: function (request) {
+              request.setRequestHeader("X-CSRFToken", _csrf);
+            },
+          });
+          $.ajax({
+            type: "POST",
+            url: "{{url_for('admin.ai_lab')}}",
+            data: JSON.stringify(lab),
+            contentType: "application/json;charset=UTF-8",
+            dataType: "json",
+            success: async function (data) {
+              console.log(data)
+                window.location.href = `/ai/lab/${data.lab_slug}/view`;
+            },
+          });
+    })
+
+
+
+  });
+</script>
+{% endblock scripts %}
