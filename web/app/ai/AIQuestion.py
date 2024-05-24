@@ -32,4 +32,4 @@ class AIQuestion(AIPromptValidation):
         super().sanitize_values(**kwargs)
 
     def generate_question_string(self) -> str:
-        return f"Bana bu oluşturduğun lab ile alakalı {self.question_number} tane {self.difficulty} soru oluşturur musun? Soruyu yazarken Soru: diye başla !"
+        return f"Bana bu oluşturduğun lab ile alakalı {self.question_number} tane {self.difficulty} soru oluşturur musun? Soru çok çok kısa olsun 2 kelime falan Soruyu yazarken Soru: diye başla !"

@@ -253,9 +253,20 @@
                     </code>
                   </div>
                 </div>
-                {% for question in lab.questions %}
-                    {{ question.question_description :  question.question_value}}
-                {% endfor %}
+                <div class="row m-4 p-4">
+                  <div style="border: 2px solid white;border-radius:10px;" class="col-md p-4">
+                  {% for question in lab.questions %}
+                    <p class="card-text text-white">
+                      <span class="badge badge-danger me-4">Question: </span> {{ question.question_description }}
+                    </p>
+                    <br>
+                    <p class="card-text text-white">
+                      <span class="badge badge-success me-4">Answer: </span>{{question.question_value}}
+                    </p>
+                  {% endfor %}
+                  </div>
+                </div>
+              
               
             </div>
           </div>
@@ -277,7 +288,7 @@
         <button
           id="removeLab"
           type="button"
-          style="background-color: #943124; border-radius: 5px"
+          style="background-color: #303030; border-radius: 5px"
           class="btn btn-sm text-white"
         >
         Remove Lab
@@ -303,7 +314,7 @@
       });
       $.ajax({
         type: "POST",
-        url: "{{url_for('admin.ai_lab_generate')}}",
+        url: "{{url_for('admin.ai_lab_generate', lab_slug=lab.slug)}}",
         data: JSON.stringify(data),
         contentType: "application/json;charset=UTF-8",
         dataType: "json",
@@ -323,7 +334,7 @@
       });
       $.ajax({
         type: "POST",
-        url: "{{url_for('admin.ai_lab_generate')}}",
+        url: "{{url_for('admin.ai_lab_generate', lab_slug=lab.slug)}}",
         data: JSON.stringify(data),
         contentType: "application/json;charset=UTF-8",
         dataType: "json",

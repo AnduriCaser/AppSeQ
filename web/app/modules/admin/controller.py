@@ -514,7 +514,7 @@ async def ai_lab():
     return jsonify({"message": "Something went wrong"}), 500
 
 
-@admin.route("/ai/lab/<string:lab_slug>/generate")
+@admin.route("/ai/lab/<string:lab_slug>/generate", methods=["POST"])
 @auth_required("session")
 @roles_accepted("administrator")
 def ai_lab_generate(lab_slug):
@@ -524,7 +524,7 @@ def ai_lab_generate(lab_slug):
 
         if data and lab:
             if data.get("message") == "decline":
-                db_session.remove(lab)
+                db_session.delete(lab)
                 db_session.commit()
 
         return jsonify({"message": "OK"})
@@ -535,7 +535,6 @@ def ai_lab_generate(lab_slug):
 @auth_required("session")
 def view_ai_lab_generate(lab_slug):
     lab = db_session.query(Lab).filter(Lab.slug == lab_slug).first()
-    print(lab)
     return render_template("admin/view_lab_ai.html", lab=lab)
 
 

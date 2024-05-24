@@ -3,6 +3,7 @@ import random
 from app.ai.AIQuestion import AIQuestion
 from app.ai.AIQuestionAnswer import AIQuestionAnswer
 
+
 class AIPrompt:
     _const = "Siber güvenlik eğitimi vereceğim. Bana dilinde labı hazırlar mısın lütfen"
 
@@ -19,13 +20,20 @@ class AIPrompt:
         self.aiQuestion = aiQuestion
         self._options = {
             "languages": ["PHP", "Java", "Python", "Ruby", "Node Js", "C++"],
-            "vulnerabilities": ["sql injection", "xss", "idor", "deserialization", "rce", "prototype pollution"],
+            "vulnerabilities": [
+                "sql injection",
+                "xss",
+                "idor",
+                "deserialization",
+                "rce",
+                "prototype pollution",
+            ],
         }
 
     def _validate_vulnerability(self, vulnerability: str):
         if vulnerability is None and vulnerability in self._options["vulnerabilities"]:
             raise ValueError("QuestionNumber must be a positive integer")
-        
+
         self._selected["vulnerability"] = vulnerability
 
         return vulnerability
@@ -33,7 +41,7 @@ class AIPrompt:
     def _validate_language(self, language: str):
         if language is None and language in self._options["languages"]:
             raise ValueError("QuestionNumber must be a positive integer")
-        
+
         self._selected["language"] = language
 
         return language
@@ -67,7 +75,7 @@ class AIPrompt:
                 },
                 {
                     "role": "user",
-                    "content": f"{chunks} {self._selected['language']} dilinde {self._selected['vulnerability']} labı hazırlar mısın lütfen. Lab kod örneği olacak ! Labı yazarken Lab: diye başla !",
+                    "content": f"{chunks} {self._selected['language']} dilinde {self._selected['vulnerability']} labı hazırlar mısın lütfen. Lab kod örneği olacak ! Düzgün bir biçimde labı ver syntaxı doğru olsun ! Labı yazarken Lab: diye başla !",
                 },
                 {
                     "role": "user",
@@ -78,11 +86,9 @@ class AIPrompt:
                     "content": AIQuestionAnswer.generate_answer_string(),
                 },
             ]
-            
-            
+
             return self.get_message
-        
-    
+
     @property
     def get_message(self):
         return self.messages
