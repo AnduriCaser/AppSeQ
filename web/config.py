@@ -26,7 +26,7 @@ SECURITY_JOIN_USER_ROLES = True
 
 API_URL = "https://api.openai.com"
 
-API_KEY = "sk-proj-EQxtlnHV1yfRsfQlX8h7T3BlbkFJbK15AF33RFSUkSiM9KUk"
+API_KEY = "sk-proj-xLqXWzZsMpE8R6XNGH9zT3BlbkFJs9cjPb0PFz0eCSefifDQ"
 
 MAIL_USERNAME = "carlosthier89@gmail.com"
 
