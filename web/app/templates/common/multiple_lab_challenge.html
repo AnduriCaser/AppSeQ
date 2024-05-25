@@ -53,36 +53,6 @@
         {{lab.description}}
       </p>
     </div>
-    {% if lab.static == False%}
-    <div class="col-md">
-      <div class="float-end">
-        <a
-          href="{{url_for('user.labs_start',slug=lab.slug)}}"
-          style="
-            background-color: #943124 !important;
-            color: white;
-            border-radius: 5px;
-          "
-          class="btn btn-sm"
-        >
-          <i style="color: white" class="fa-solid fa-pen-to-square"></i>
-          <span class="text-center fw-bolder">Start The Lab</span>
-        </a>
-        <a
-          href="{{url_for('user.labs_stop',slug=lab.slug)}}"
-          style="
-            background-color: #333 !important;
-            color: white;
-            border-radius: 5px;
-          "
-          class="btn btn-sm"
-        >
-          <i style="color: white" class="fa-solid fa-pen-to-square"></i>
-          <span class="text-center fw-bolder">Stop The Lab</span>
-        </a>
-      </div>
-    </div>
-    {% endif %}
   </div>
   <div style="width: 28%" class="row g-0 mt-6 p-2">
     <div class="col-md p-0">
@@ -166,55 +136,105 @@
       <p class="card-text text-white p-8">{{lab.mission_statement}}</p>
     </div>
   </div>
-  {% if lab.questions|length > 0 %}
-    {% set lab_inside = false %}
-    {% set question_solved = false %}
-    {% set counter = 0 %}
-    {% for question in lab.questions %}
-        {% set counter = counter + 1 %}
-        <div style="display: none" class="row py-0 px-4 questions_animate_box">
-            <div style="height: 140px; background-color: rgb(20, 20, 20); border-radius: 7px; font-family: Source Sans Pro, sans-serif !important;" class="col-md p-0">
-                <p class="card-text text-white p-8 pb-0">
-                    {{ counter }}. {{ question.question_description }}
-                </p>
-                <div style="width: 54%" class="float-start d-flex justify-content-center align-items-center px-8">
-                    <input type="hidden" name="question_id[]" value="{{ question.id }}" />
-                    {% set question_solved = true %}
-                    {% for q_solved in solved_lab.questions %}
-                        {% if q_solved.id == question.id %}
-                            
-                            {% if q_solved.solved_by == current_user %}
-                                <input disabled style="background-color: #202020; border-radius: 5px; border-color: #e45735 !important; color: white;" class="form-control" type="text" name="answer[]" value="{{ q_solved.question_value }}" />
-                            {% else %}
-                                <input disabled style="background-color: #202020; border-radius: 5px; border-color: #e45735 !important; color: white;" class="form-control" type="text" name="answer[]" value="Solved by another user :(" />
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if question_solved == false %}
-                        <input style="background-color: #202020; border-radius: 5px; color: white;" class="form-control" type="text" name="answer[]" value="" />
-                    {% endif %}
-                    <i style="font-size: 16px; color: rgb(185, 185, 185)" class="fa-solid fa-bullseye mx-2"></i>
-                    <p style="font-size: 12px; color: rgb(185, 185, 185); white-space: nowrap;" class="card-text mx-2">
-                        {{ question.question_point }} points
-                    </p>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
+  {% if lab.questions|length > 0 %} {% set solved_question_ids =
+  solved_lab.questions|map(attribute='id') %} {% for question in lab.questions
+  %}
+  <div style="display: none" class="row py-0 px-4 questions_animate_box">
+    <div
+      style="
+        height: 140px;
+        background-color: rgb(20, 20, 20);
+        border-radius: 7px;
+        font-family: Source Sans Pro, sans-serif !important;
+      "
+      class="col-md p-0"
+    >
+      <p class="card-text text-white p-8 pb-0">
+        {{ loop.index }}. {{ question.question_description }}
+      </p>
+      <div
+        style="width: 54%"
+        class="float-start d-flex justify-content-center align-items-center px-8"
+      >
+        <input type="hidden" name="question_id[]" value="{{ question.id }}" />
 
-    <div class="row mt-2 p-2">
-        <div class="col-md">
-            <div class="float-end">
-                <button id="send_answer" style="background-color: #943124 !important; color: white; border-radius: 5px;" class="btn btn-sm">
-                    <i style="color: white" class="fa-solid fa-pen-to-square"></i>
-                    <span class="text-center fw-bolder">Submit</span>
-                </button>
-            </div>
-        </div>
+        {% if question.id in solved_question_ids %} {% if question.solved_by ==
+        current_user %}
+        <input
+          disabled
+          style="
+            background-color: #202020;
+            border-radius: 5px;
+            border-color: #e45735 !important;
+            color: white;
+          "
+          class="form-control"
+          type="text"
+          name="answer[]"
+          value="{{ question.question_value }}"
+        />
+        {% else %}
+        <input
+          disabled
+          style="
+            background-color: #202020;
+            border-radius: 5px;
+            border-color: #e45735 !important;
+            color: white;
+          "
+          class="form-control"
+          type="text"
+          name="answer[]"
+          value="Solved by another user :()"
+        />
+        {% endif %} {% set question_solved = true %} {% else %}
+        <input
+          style="background-color: #202020; border-radius: 5px; color: white"
+          class="form-control"
+          type="text"
+          name="answer[]"
+          value=""
+        />
+        {% endif %}
+
+        <i
+          style="font-size: 16px; color: rgb(185, 185, 185)"
+          class="fa-solid fa-bullseye mx-2"
+        ></i>
+        <p
+          style="
+            font-size: 12px;
+            color: rgb(185, 185, 185);
+            white-space: nowrap;
+          "
+          class="card-text mx-2"
+        >
+          {{ question.question_point }} points
+        </p>
+      </div>
     </div>
-{% endif %}
+  </div>
+  {% endfor %}
 
- {% else %} {% endif %}
+  <div class="row mt-2 p-2">
+    <div class="col-md">
+      <div class="float-end">
+        <button
+          id="send_answer"
+          style="
+            background-color: #943124 !important;
+            color: white;
+            border-radius: 5px;
+          "
+          class="btn btn-sm"
+        >
+          <i style="color: white" class="fa-solid fa-pen-to-square"></i>
+          <span class="text-center fw-bolder">Submit</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endif %} {% else %} {% endif %}
 </div>
 {% endblock content %} {% block scripts %}
 <script>
@@ -247,39 +267,46 @@
 
     $("#send_answer").click(function () {
       _csrf = "{{csrf_token()}}";
-
+    
       $(".questions_animate_box input[type='hidden']").each(function (
         index,
         element
       ) {
+        answers = [];
+    
         var questionId = $(element).val();
+    
+        var questionValue = $(element)
+          .siblings(".form-control:not(:disabled)")
+          .val();
 
-        var questionValue = $(element).siblings(".form-control").val();
+    
+        if (questionValue) {
+          answers.push({
+            id: questionId,
+            question_value: questionValue,
+          });
+        }
 
-        answers.push({
-          id: questionId,
-          question_value: questionValue,
+    
+        $.ajaxSetup({
+          beforeSend: function (request) {
+            request.setRequestHeader("X-CSRFToken", _csrf);
+          },
+        });
+    
+        $.ajax({
+          type: "POST",
+          url: "{{url_for('user.multiple_lab_challenge_submit_answer',lab_slug=lab.slug, room_slug=room.room_slug)}}",
+          contentType: "application/json;charset=UTF-8",
+          data: JSON.stringify(answers),
+          success: function () {
+            location.reload();
+          },
         });
       });
-
-      $.ajaxSetup({
-        beforeSend: function (request) {
-          request.setRequestHeader("X-CSRFToken", _csrf);
-        },
-      });
-
-      $.ajax({
-        type: "POST",
-        url: "{{url_for('user.multiple_lab_challenge_submit_answer',lab_slug=lab.slug, room_slug=room.room_slug)}}",
-        contentType: "application/json;charset=UTF-8",
-        data: JSON.stringify(answers),
-        success: function () {
-          location.reload();
-        },
-      });
-
-      answers = [];
     });
+    
   });
 </script>
 {% endblock scripts %}

@@ -24,6 +24,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from app.modules.user.models import *
 from app.db import db_session
+import requests
 
 common = Blueprint("common", __name__, url_prefix="/common")
 

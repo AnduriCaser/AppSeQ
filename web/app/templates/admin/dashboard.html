@@ -89,28 +89,26 @@
 {% endblock sidebar %} 
 
 {% block multiple_sidebar %}
-{% for lab_room in current_user.lab_rooms %}
+{% for lab_room in lab_rooms %}
 <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-    <span class="menu-link">
-        <span class="menu-icon">
-            <i class="bi bi-archive fs-3"></i>
-        </span>
-        <span class="menu-title">{{lab_room.name}}</span>
-        <span class="menu-arrow"></span>
-    </span>
-    {% for challenge in course.challenges %}
-    <div class="menu-sub menu-sub-accordion menu-active-bg">
-        <div data-kt-menu-trigger="click" class="menu-item menu-accordion">
-            <span class="menu-link">
-                <span class="menu-bullet">
-                    <span class="bullet bullet-dot"></span>
-                </span>
-                <span class="menu-title">{{challenge.name}}</span>
-                <span class="menu-arrow"></span>
-            </span>
-        </div>
-    </div>
-    {% endfor %}
+  <span class="menu-link">
+      <span class="menu-icon">
+          <i class="bi bi-archive fs-3"></i>
+      </span>
+      <span class="menu-title">{{lab_room.name}}</span>
+      <span class="menu-arrow"></span>
+  </span>
+<div class="menu-sub menu-sub-accordion menu-active-bg">
+      <div class="menu-item menu-accordion">
+    <a class="menu-link" href="{{url_for('common.multiple_lab_challenge_room',lab_slug=lab_room.lab.slug, room_slug=lab_room.room_slug)}}">
+      <span class="menu-bullet">
+        <span class="bullet bullet-dot"></span>
+      </span>
+      <span class="menu-title">Join Lab Room</span>
+    </a>
+      </div>
+  </div>
+
 </div>
 {% endfor %}
 

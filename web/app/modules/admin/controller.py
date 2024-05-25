@@ -55,6 +55,7 @@ def dashboard():
     courses = db_session.query(Course).limit(per_page).offset(offset)
     full_courses = db_session.query(Course).all()
     labs = db_session.query(Lab).limit(per_page).offset(offset)
+    lab_rooms = db_session.query(LabRoom).all()
     course_paginate = Pagination(
         page=page,
         per_page=per_page,
@@ -79,6 +80,7 @@ def dashboard():
         courses=courses,
         labs=labs,
         full_courses=full_courses,
+        lab_rooms=lab_rooms,
     )
 
 

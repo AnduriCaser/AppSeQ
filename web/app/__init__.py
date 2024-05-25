@@ -26,6 +26,7 @@ async def async_before_request():
 
 def create_app():
     app = Flask(__name__)
+    app.jinja_env.add_extension('jinja2.ext.loopcontrols')
     app.config.from_object("config")
 
     with app.app_context():

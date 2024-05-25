@@ -11,10 +11,38 @@
   <span class="h-20px border-gray-200 border-start ms-3 mx-2"></span>
 </h1>
 {% if role == "administrator" %}
+<div class="col-md">
+  <div class="float-end">
+    <a
+      href="{{url_for('user.labs_start',slug=lab.slug)}}"
+      style="
+        background-color: #943124 !important;
+        color: white;
+        border-radius: 5px;
+      "
+      class="btn btn-sm"
+    >
+      <i style="color: white" class="fa-solid fa-pen-to-square"></i>
+      <span class="text-center fw-bolder">Start The Lab</span>
+    </a>
+    <a
+      href="{{url_for('user.labs_stop',slug=lab.slug)}}"
+      style="
+        background-color: #333 !important;
+        color: white;
+        border-radius: 5px;
+      "
+      class="btn btn-sm"
+    >
+      <i style="color: white" class="fa-solid fa-pen-to-square"></i>
+      <span class="text-center fw-bolder">Stop The Lab</span>
+    </a>
+  </div>
+</div>
 <button
   id="trace_answers"
   style="background-color: #943124; border-radius: 5px"
-  class="btn btn-sm text-white mx-2 float-end"
+  class="btn btn-sm text-white mx-2 ms-4 float-end"
 >
   Trace Answers Page
 </button>
@@ -26,6 +54,7 @@
 >
   Challenge Page
 </button>
+<span id="challenge_url" class="badge badge-success">http://localhost:3000?username=</h5>
 {% endif %} {% endblock header_tag %} {% block nav_tag %}
 <div class="menu-item">
   <a class="menu-link active" href="{{url_for('admin.dashboard')}}">
@@ -281,9 +310,9 @@
                         href="#"
                         class="fs-5 fw-bolder mb-2"
                         style="color: #b43c2c"
-                        >Melody Macy</a
+                        >{{current_user.username}}</a
                       >
-                      <div class="fw-bold text-gray-400">melody@altbox.com</div>
+                      <div class="fw-bold text-gray-400">{{current_user.email}}</div>
                     </div>
                     <!--end::Details-->
                   </div>
@@ -3320,10 +3349,14 @@
       newMessage.animate({ left: endPosition }, 600);
     });
 
+  
+
+    
+
     socket.on("end_challenge", function (data) {
       $("#modalIframe").hide();
       $("#challenge_page").prop("disabled", true);
-      //window.location = "{{url_for('common.multiple_lab_challenge_room_winner', room_slug=room_slug, lab_slug=lab.slug)}}";
+      window.location = "{{url_for('common.multiple_lab_challenge_room_winner', room_slug=room_slug, lab_slug=lab.slug)}}";
     });
 
     {% if role == "administrator" %}
@@ -3455,8 +3488,7 @@
                 <div class="symbol-badge bg-success start-100 top-100 border-4 h-15px w-15px ms-n2 mt-n2"></div>
               </div>
               <div class="ms-3">
-                <a href="#" class="fs-5 fw-bolder mb-2" style="color: #b43c2c">Melody Macy</a>
-                <span class="text-muted fs-7 mb-1">2 mins</span>
+                <a href="#" class="fs-5 fw-bolder mb-2" style="color: #b43c2c">${username}</a>
               </div>
             </div>
             <div class="p-5 rounded fw-bold mw-lg-400px text-start text-white" data-kt-element="message-text" style="background: rgb(51, 51, 51)">
@@ -3476,7 +3508,7 @@
                 <div class="symbol-badge bg-success start-100 top-100 border-4 h-15px w-15px ms-n2 mt-n2"></div>
               </div>
               <div class="ms-3">
-                <a href="#" class="fs-5 fw-bolder mb-2" style="color: #b43c2c">Melody Macy</a>
+                <a href="#" class="fs-5 fw-bolder mb-2" style="color: #b43c2c">${username}</a>
                 <span class="text-muted fs-7 mb-1">2 mins</span>
               </div>
             </div>

@@ -34,6 +34,7 @@ from app.db import db_session
 import re
 from werkzeug.utils import secure_filename
 import subprocess
+from collections import defaultdict
 
 
 def allowed_file():
@@ -151,7 +152,7 @@ def view_lab(slug):
 
 
 @user.route("/labs/<string:slug>/start", methods=["GET"])
-@roles_accepted("user")
+@roles_accepted("user", "administrator")
 @auth_required("session")
 def labs_start(slug):
     global node_process
@@ -161,11 +162,12 @@ def labs_start(slug):
             node_process = subprocess.Popen(["nodemon", f"{lab.folder}/index.js"])
             return "Application started"
 
+    
     return "Application already started"
 
 
 @user.route("/labs/<string:slug>/stop", methods=["GET"])
-@roles_accepted("user")
+@roles_accepted("user", "administrator")
 @auth_required("session")
 def labs_stop(slug):
     global node_process
@@ -311,6 +313,8 @@ def multiple_lab_challenge_screen(lab_slug, room_slug):
 def multiple_lab_challenge_submit_answer(lab_slug, room_slug):
     if request.method == "POST":
         data = request.get_json()
+        
+        print(data)
 
         try:
             lab = db_session.query(Lab).filter_by(slug=lab_slug).first()
@@ -341,16 +345,19 @@ def multiple_lab_challenge_submit_answer(lab_slug, room_slug):
 
         for q in data:
             question_id = int(q["id"])
-            question_value = q["question_value"]
+            question_value = str(q["question_value"])
+            
+            print(question_id, question_value)
 
             question = next(
                 (
                     question
                     for question in lab.questions
-                    if question.id == question_id
-                    and question.question_value == question_value
+                    if question.id == question_id and str(question.question_value) == question_value  # Ensure correct type comparison
                 ),
+                None,
             )
+            
 
             if question:
                 question_key = f"question_{question.id}_solved"
@@ -374,7 +381,22 @@ def multiple_lab_challenge_submit_answer(lab_slug, room_slug):
             target_question in solved_lab.questions for target_question in lab.questions
         ):
             solved_lab.all_solved = True
-            room.winner = current_user
+            
+            user_scores = defaultdict(int)
+
+            for q in solved_lab.questions:
+                user_scores[q.solved_by] += q.question_point
+
+            max_score = 0
+            room_winner = None
+
+            for user, score in user_scores.items():
+                if score > max_score:
+                    max_score = score
+                    room_winner = user
+
+            room.winner = room_winner
+            
             db_session.commit()
 
             emit(
